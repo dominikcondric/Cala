@@ -1,0 +1,24 @@
+add_library(ImGui 
+	STATIC
+		ImGui/imgui.cpp
+		ImGui/imgui_demo.cpp
+		ImGui/imgui_draw.cpp
+		ImGui/backends/imgui_impl_glfw.cpp
+		ImGui/backends/imgui_impl_opengl3.cpp
+		ImGui/imgui_widgets.cpp
+		ImGui/imgui_tables.cpp
+)
+
+target_link_libraries(ImGui
+	PRIVATE
+		OpenGL::GL
+		glfw
+	PUBLIC
+		glad
+)
+
+target_include_directories(ImGui
+	PUBLIC 
+		ImGui/
+		ImGui/backends/
+)

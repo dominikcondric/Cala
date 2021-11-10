@@ -1,0 +1,9 @@
+#pragma once
+#include <filesystem>
+
+namespace Cala {
+	inline std::filesystem::path getProjectPath()
+	{
+		return std::filesystem::path("@CMAKE_SOURCE_DIR@/");
+	}
+}
