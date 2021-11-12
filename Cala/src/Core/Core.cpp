@@ -4,19 +4,23 @@
 	#include <windows.h>
 
 namespace Cala {
-	void sleep(uint64_t miliseconds)
+	void sleep(uint64_t milliseconds)
 	{
-		Sleep(miliseconds);
+		Sleep(milliseconds);
 	}
 }
 
 #elif defined CALA_PLATFORM_LINUX
-	#include <unistd.h>
+	#include <time.h>
 
 namespace Cala {
-	void sleep(uint64_t miliseconds)
+	void sleep(uint64_t milliseconds)
 	{
-		sleep(miliseconds);
+		struct timespec ts;
+		ts.tv_sec = milliseconds / 1000;
+		ts.tv_nsec = (milliseconds % 1000) * 1000000;
+		nanosleep(&ts, NULL);
+		sleep(milliseconds);
 	}
 }
 
