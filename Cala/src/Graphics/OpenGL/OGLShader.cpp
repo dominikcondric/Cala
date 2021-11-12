@@ -5,10 +5,18 @@
 #include <iostream>
 #include "OGLShader.h"
 #include "Core/Core.h"
+#include <cstring>
 
-OGLShader::OGLShader(OGLShader&& other) noexcept : programID(other.programID)
+OGLShader::OGLShader(OGLShader&& other) noexcept
 {
+	*this = std::move(other);
+}
+
+OGLShader& OGLShader::operator=(OGLShader&& other) noexcept
+{
+	memcpy(this, &other, sizeof(OGLShader));
 	other.programID = GL_NONE;
+	return *this;
 }
 
 OGLShader::~OGLShader()

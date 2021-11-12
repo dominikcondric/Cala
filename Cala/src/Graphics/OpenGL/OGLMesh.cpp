@@ -10,10 +10,7 @@ OGLMesh::~OGLMesh()
 
 OGLMesh::OGLMesh(OGLMesh&& other) noexcept
 {
-	std::memcpy(this, &other, sizeof(OGLMesh));
-	other.vao = GL_NONE;
-	other.vbo = GL_NONE;
-	other.ebo = GL_NONE;
+	*this = std::move(other);
 }
 
 OGLMesh& OGLMesh::operator=(OGLMesh&& other) noexcept

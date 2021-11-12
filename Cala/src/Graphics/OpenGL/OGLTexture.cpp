@@ -1,8 +1,21 @@
 #include "OGLTexture.h"
+#include <cstring>
 
 OGLTexture::~OGLTexture()
 {
 	glDeleteTextures(1, &textureID);
+}
+
+OGLTexture::OGLTexture(OGLTexture&& other) noexcept
+{
+	*this = std::move(other);
+}
+
+OGLTexture& OGLTexture::operator=(OGLTexture&& other) noexcept
+{
+	memcpy(this, &other, sizeof(OGLTexture));
+	other.textureID = GL_NONE;
+	return *this;
 }
 
 void OGLTexture::setForSampling(uint32_t bindingIndex) const

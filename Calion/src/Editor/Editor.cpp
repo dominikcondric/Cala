@@ -78,8 +78,7 @@ Editor::Editor(const Window::WindowSpecification& windowSpec, Cala::RenderingAPI
 	mainScene.addComponent<RenderingComponent>(light2);
 	mainScene.addComponent<LightComponent>(light2);
 	RenderingComponent& secondLightRenderingComp = mainScene.getComponent<RenderingComponent>(light2);
-	secondLightRenderingComp.mesh.reset(renderer->createMesh());
-	secondLightRenderingComp.mesh = firstLightRenderingComp.mesh;
+	secondLightRenderingComp.mesh = mainScene.getComponent<RenderingComponent>(light1).mesh;
 	secondLightRenderingComp.color = glm::vec4(1.f);
 	secondLightRenderingComp.lightened = false;
 	TransformComponent& secondLightTransformComp = mainScene.getComponent<TransformComponent>(light2);

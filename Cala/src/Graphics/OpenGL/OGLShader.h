@@ -6,6 +6,8 @@ public:
 	OGLShader() = default;
 	OGLShader(const OGLShader& other) = delete;
 	OGLShader(OGLShader&& other) noexcept;
+	OGLShader& operator=(OGLShader&& other) noexcept;
+	OGLShader& operator=(const OGLShader& other) = delete;
 	~OGLShader() override;
 	void attachShader(ShaderType shaderStage, const std::filesystem::path& filePath) override;
 	void createProgram() override;

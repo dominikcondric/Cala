@@ -1,5 +1,6 @@
 #include "OGLFramebuffer.h"
 #include <iostream>
+#include <cstring>
 
 #define MAX_COLOR_ATTACHMENTS 32
 
@@ -18,6 +19,18 @@ OGLFramebuffer::~OGLFramebuffer()
 		}
 	}
 	glDeleteFramebuffers(1, &framebufferID);
+}
+
+OGLFramebuffer::OGLFramebuffer(OGLFramebuffer&& other) noexcept
+{
+	*this = std::move(other);
+}
+
+OGLFramebuffer& OGLFramebuffer::operator=(OGLFramebuffer&& other) noexcept
+{
+	memcpy(this, &other, sizeof(OGLFramebuffer));
+	other.framebufferID = GL_NONE;
+	return *this;
 }
 
 void OGLFramebuffer::generateShadowMap(uint32_t width, uint32_t height)
