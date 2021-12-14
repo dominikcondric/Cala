@@ -37,7 +37,7 @@ void BaseApplication::gameLoop()
 		if (fpsLockValue >= 30.f && time.deltaTime < 1.f / fpsLockValue)
 		{
 			Cala::sleep(uint64_t(glm::floor((1.f / fpsLockValue - time.deltaTime) * 1000)) / 2);
-			time.update();
+			time.incrementalUpdate();
 		}
 
 	} while (!shouldExit());

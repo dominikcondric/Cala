@@ -17,13 +17,13 @@ void Mesh::loadSphere(uint32_t stackCount, uint32_t sectorCount, float radius)
 	for (uint32_t i = 0; i <= stackCount; ++i)
 	{
 		stackAngle = pi / 2 - i * stackStep;
-		xy = radius * cos(stackAngle);
-		vertex.z = radius * sin(stackAngle);
+		xy = radius * glm::cos(stackAngle);
+		vertex.z = radius * glm::sin(stackAngle);
 		for (uint32_t j = 0; j <= sectorCount; ++j)
 		{
 			sectorAngle = j * sectorStep;
-			vertex.x = xy * cos(sectorAngle);
-			vertex.y = xy * sin(sectorAngle);
+			vertex.x = xy * glm::cos(sectorAngle);
+			vertex.y = xy * glm::sin(sectorAngle);
 			vertices.push_back(vertex);
 		}
 	}

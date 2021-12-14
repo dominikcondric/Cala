@@ -10,5 +10,6 @@ namespace Cala {
 		float lastDeltaTime = 0.f;
 
 		void update();
+		void incrementalUpdate();
 	};
 }
