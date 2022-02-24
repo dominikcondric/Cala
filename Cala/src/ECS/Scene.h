@@ -132,7 +132,7 @@ inline bool Scene::hasComponent(Entity entityID) const
 	static_assert(std::is_base_of<Component, T>(), "T is not derived from Component!");
 
 	const auto& entCompTable = entityComponentTable.vector[entityID].first;
-	return bool(entCompTable.test(componentDB.getComponentID<T>()));
+	return entCompTable.test(componentDB.getComponentID<T>());
 }
 
 template<class T>
@@ -146,7 +146,7 @@ inline void Scene::removeComponent(Entity entityID)
 
 	ConsistentComponentVector<T>& components = componentDB.getComponentList<T>();
 	ComponentIndex componentIndex = entityComponentTable.vector[entityID].second[componentID];
-	std::vector<Entity>& componentEntities = components.vector[componentIndex].entities;
+	std::vector<Entity>& componentEntities = components.vector[componentIndex].entities; // all entities sharing this component
 	componentEntities.erase(std::lower_bound(componentEntities.begin(), componentEntities.end(), entityID));
 
 	if (componentEntities.empty())

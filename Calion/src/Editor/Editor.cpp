@@ -117,7 +117,10 @@ void Editor::run()
 	//for (const auto& entity : mainScene.getComponentCollection<ScriptingComponent>())
 		//entity.component.getScript()->onUpdate(mainScene, entity.entity, time, mainWindow.getIO());
 
-	renderingSystem.setSkybox(mainScene.getComponentEntityList<SkyboxComponent>()[0]);
+	const auto& skyboxEntities = mainScene.getComponentEntityList<SkyboxComponent>();
+	if (skyboxEntities.getSize() != 0) 
+		renderingSystem.setSkybox(skyboxEntities[0]);
+
 	for (Entity drawable : mainScene.getComponentEntityList<RenderingComponent>())
 		renderingSystem.pushToDrawQueue(drawable, mainScene.getComponent<RenderingComponent>(drawable));
 
@@ -227,6 +230,7 @@ void Editor::arrangeGUI()
 {
 	leftPanel.beginWindow();
 	renderEntitiesList();
+	renderComponentList();
 	leftPanel.endWindow();
 
 	rightPanel.beginWindow();
@@ -271,6 +275,7 @@ void Editor::renderRendererStateOptions()
 
 void Editor::renderEntitiesList()
 {
+	ImGui::BeginChild("##Entity list", ImVec2(0.f, ImGui::GetWindowHeight() / 2.f), true);
 	if (ImGui::CollapsingHeader("Entities list"))
 	{
 		ImGui::PushTextWrapPos();
@@ -298,7 +303,6 @@ void Editor::renderEntitiesList()
 		{
 			if (ImGui::Button("Delete entity", ImVec2(ImGui::GetContentRegionAvailWidth(), 40.f)))
 			{
-				
 				mainScene.removeEntity(selectedEntity);
 				selectedEntity = -1;
 			}
@@ -308,6 +312,36 @@ void Editor::renderEntitiesList()
 		ImGui::Unindent();
 		ImGui::PopTextWrapPos();
 	}
+	ImGui::EndChild();
+}
+
+void Editor::renderComponentList()
+{
+	ImGui::BeginChild("##Entity component list", ImVec2(0.f, ImGui::GetWindowHeight() / 2.f), true);
+	if (selectedEntity != -1) 
+	{
+		if (mainScene.hasComponent<RenderingComponent>(selectedEntity))
+		{
+			if (ImGui::Button("Rendering component", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
+			{
+			}
+		}
+
+		if (mainScene.hasComponent<TextureComponent>(selectedEntity))
+		{
+			if (ImGui::Button("Texture component", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
+			{
+			}
+		}
+
+		if (mainScene.hasComponent<LightComponent>(selectedEntity))
+		{
+			if (ImGui::Button("Light component", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
+			{
+			}
+		}
+	}
+	ImGui::EndChild();
 }
 
 void Editor::repositionElements()

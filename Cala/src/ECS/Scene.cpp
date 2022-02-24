@@ -17,7 +17,7 @@ Entity Scene::addEntity(const std::string& entTag)
 
 void Scene::removeEntity(Entity entityID)
 {
-	auto& entityComponents = entityComponentTable.vector[entityID];
+	auto& entityComponents = entityComponentTable.vector[entityID]; // Vector containing bitset and component indices for entity with given ID
 	for (ComponentID i = 0; i < MAX_COMPONENTS; i++)
 	{
 		if (entityComponents.first.test(i))
@@ -34,16 +34,18 @@ void Scene::removeEntity(Entity entityID)
 		Entity swappedEntity = (Entity)entCompTableSize;
 		for (ComponentID i = 0; i < MAX_COMPONENTS; i++)
 		{
-			ComponentIndex compIndex = entityComponents.second[i];
+			// entityComponents now represent components of swapped entity so its necessary to change component entity list!
 			if (entityComponents.first.test(i))
 			{
-				auto& entityComponentsIndices = componentDB.getBaseComponentVectorByID(i).getComponentEntityList(compIndex);
-				*std::lower_bound(entityComponentsIndices.begin(), entityComponentsIndices.end(), swappedEntity) = entityID;
-				std::sort(entityComponentsIndices.begin(), entityComponentsIndices.end());
+				ComponentIndex compIndex = entityComponents.second[i]; 
 
-				auto& entityComponentList = componentDB.getBaseComponentVectorByID(i).getComponentEntityList(compIndex);
-				*std::lower_bound(entityComponentList.begin(), entityComponentList.end(), swappedEntity) = entityID;
-				std::sort(entityComponentList.begin(), entityComponentList.end());
+				auto& componentEntityList = componentDB.getBaseComponentVectorByID(i).getComponentEntityList(compIndex);
+				*std::lower_bound(componentEntityList.begin(), componentEntityList.end(), swappedEntity) = entityID;
+				std::sort(componentEntityList.begin(), componentEntityList.end());
+
+				auto& componentEntityIndices = componentDB.getComponentEntityListByID(i);
+				*std::lower_bound(componentEntityIndices.begin(), componentEntityIndices.end(), swappedEntity) = entityID;
+				std::sort(componentEntityIndices.begin(), componentEntityIndices.end());
 			}
 		}
 	}

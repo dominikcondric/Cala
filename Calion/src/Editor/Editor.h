@@ -18,6 +18,7 @@ private:
 	void arrangeGUI();
 	void renderRendererStateOptions();
 	void renderEntitiesList();
+	void renderComponentList();
 	void repositionElements();
 	bool isCursorInsideViewport() const;
 		

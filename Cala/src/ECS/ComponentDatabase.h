@@ -27,9 +27,9 @@ public:
 	}
 
 private:
-	std::unordered_map<std::size_t, ComponentID> componentMap;
-	std::vector<Unique<BaseConsistentComponentVector>> componentList;
-	std::vector<std::vector<Entity>> componentEntityList;
+	std::unordered_map<std::size_t, ComponentID> componentIDMap; // Stores component identifiers (class hash codes)
+	std::vector<Unique<BaseConsistentComponentVector>> componentList; // List of component lists
+	std::vector<std::vector<Entity>> componentEntityList; // Stores entity IDs for every component type
 };
 
 template<typename T>
@@ -47,16 +47,16 @@ inline std::vector<Entity>& ComponentDatabase::getComponentEntityList()
 template<typename T>
 inline ComponentID ComponentDatabase::getComponentID()
 {
-	const auto componentsMapIterator = componentMap.find(typeid(T).hash_code());
+	const auto componentsMapIterator = componentIDMap.find(typeid(T).hash_code());
 	ComponentID compID;
-	if (componentsMapIterator != componentMap.end())
+	if (componentsMapIterator != componentIDMap.end())
 	{
 		compID = componentsMapIterator->second;
 	}
 	else
 	{
 		compID = (ComponentID)componentList.size();
-		componentMap.insert(std::make_pair(typeid(T).hash_code(), compID));
+		componentIDMap.insert(std::make_pair(typeid(T).hash_code(), compID));
 		componentList.emplace_back(std::make_unique<ConsistentComponentVector<T>>());
 		componentEntityList.emplace_back();
 	}
