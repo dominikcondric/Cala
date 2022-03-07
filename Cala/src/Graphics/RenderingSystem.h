@@ -16,7 +16,7 @@ public:
 	void setSkybox(Entity skyboxEnt);
 	void draw(const Scene& scene, const Camera& cam);
 
-	bool helperGridEnabled = false;
+	bool helperGridEnabled = true;
 
 	enum PostProcessingEffect {
 		Bloom			= 0,

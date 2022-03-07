@@ -12,6 +12,8 @@ Entity Scene::addEntity(const std::string& entTag)
 	else
 		addComponent<TagComponent>(ent, "Entity #" + std::to_string(ent));
 
+	addComponent<TransformComponent>(ent);
+
 	return ent;
 }
 
@@ -31,6 +33,18 @@ void Scene::removeEntity(Entity entityID)
 	size_t entCompTableSize = entityComponentTable.size();
 	if (entCompTableSize != 0 && entCompTableSize != entityID)
 	{
+		void (*lastElementInsertionSort)(std::vector<Entity>&) = [](std::vector<Entity>& vector) {
+			const Entity lastElement = vector.back();
+			uint32_t j = (uint32_t)vector.size() - 1;
+			while (j > 0 && vector[j - 1] > lastElement)
+			{
+				vector[j] = vector[j - 1];
+				j--;
+			}
+
+			vector[j] = lastElement;
+		};
+
 		Entity swappedEntity = (Entity)entCompTableSize;
 		for (ComponentID i = 0; i < MAX_COMPONENTS; i++)
 		{
@@ -41,11 +55,11 @@ void Scene::removeEntity(Entity entityID)
 
 				auto& componentEntityList = componentDB.getBaseComponentVectorByID(i).getComponentEntityList(compIndex);
 				*std::lower_bound(componentEntityList.begin(), componentEntityList.end(), swappedEntity) = entityID;
-				std::sort(componentEntityList.begin(), componentEntityList.end());
+				lastElementInsertionSort(componentEntityList);
 
 				auto& componentEntityIndices = componentDB.getComponentEntityListByID(i);
 				*std::lower_bound(componentEntityIndices.begin(), componentEntityIndices.end(), swappedEntity) = entityID;
-				std::sort(componentEntityIndices.begin(), componentEntityIndices.end());
+				lastElementInsertionSort(componentEntityIndices);
 			}
 		}
 	}

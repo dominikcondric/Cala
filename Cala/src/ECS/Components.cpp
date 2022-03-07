@@ -2,7 +2,7 @@
 
 void TransformComponent::translate(const glm::vec3& t)
 {
-	translationVector = t;
+	translationVector += t;
 	transformMatrix = glm::scale(glm::translate(glm::mat4(1.f), translationVector) * getRotationMatrix(), scaleVector);
 }
 
@@ -15,7 +15,7 @@ void TransformComponent::rotate(float angle, const glm::vec3& rotationAxis)
 
 void TransformComponent::scale(const glm::vec3& s)
 {
-	scaleVector = s;
+	scaleVector *= s;
 	transformMatrix = glm::scale(glm::translate(glm::mat4(1.f), translationVector) * getRotationMatrix(), scaleVector);
 
 }

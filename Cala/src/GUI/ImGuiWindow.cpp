@@ -8,7 +8,7 @@ void ImGuiWindow::beginWindow()
 {
 	ImGui::SetNextWindowPos(ImVec2(viewport.x, viewport.y));
 	ImGui::SetNextWindowSize(ImVec2(viewport.z, viewport.w));
-	ImGui::SetNextWindowSizeConstraints(windowMinSize, windowMaxSize);
+	//ImGui::SetNextWindowSizeConstraints(windowMinSize, windowMaxSize);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, borderSize);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));

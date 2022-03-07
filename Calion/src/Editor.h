@@ -1,8 +1,9 @@
 #pragma once
 #include "Core/BaseApplication.h"
-#include "GUI/UserInterface.h"
+#include "GUI/ImGuiRenderer.h"
 #include "Graphics/RenderingSystem.h"
 #include "Core/Utility/FileDialog.h"
+#include "UIComponentProcessor.h"
 
 class Editor : public BaseApplication {
 public:
@@ -10,10 +11,11 @@ public:
 	~Editor() override = default;
 	void run();
 	void update() override;
-	void onWindowResize(const glm::ivec2 windowSize) override;
+	void onWindowResize(const glm::ivec2& windowSize) override;
 
 private:
-	void updateGuiWindows();
+	using ComponentUIFunction = void (*)(Scene&, Entity);
+
 	void drawGUI();
 	void arrangeGUI();
 	void renderRendererStateOptions();
@@ -23,16 +25,19 @@ private:
 	bool isCursorInsideViewport() const;
 		
 	PerspectiveCamera cam;
-	UserInterface gui;
+	ImGuiRenderer gui;
 	ImGuiWindow leftPanel;
 	ImGuiWindow topPanel;
 	ImGuiWindow rightPanel;
 
 	bool mouseHovered = false;
 	bool guiUsed = false;
-	glm::ivec4 sceneViewport{ 0, 0, 1440, 810 };
+	glm::uvec4 sceneViewport{ 0, 0, 1440, 810 };
 
 	// Scene
 	Scene mainScene;
 	Entity selectedEntity = -1;
+
+	// Component editing
+	UIComponentProcessor uiComponentProcessor;
 };

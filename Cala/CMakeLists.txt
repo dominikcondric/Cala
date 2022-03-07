@@ -17,6 +17,7 @@ set (srcFiles
 
 	src/ECS/ComponentDatabase.h
 	src/ECS/ConsistentComponentVector.h
+	src/ECS/ComponentIterator.h
 	src/ECS/Components.cpp 			src/ECS/Components.h
 	src/ECS/Scene.cpp 				src/ECS/Scene.h
 
@@ -38,7 +39,7 @@ set (srcFiles
 	src/Graphics/OpenGL/OGLErrorChecker.h
 
 	src/GUI/ImGuiWindow.cpp		src/GUI/ImGuiWindow.h
-	src/GUI/UserInterface.cpp	src/GUI/UserInterface.h
+	src/GUI/ImGuiRenderer.cpp	src/GUI/ImGuiRenderer.h
 
 	src/Shaders/PostProcessingVertexShader.glsl
 	src/Shaders/PostProcessingFragmentShader.glsl
@@ -55,6 +56,8 @@ add_library(Cala
 	STATIC
 		${srcFiles}
 )
+
+set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 
 if (MSVC)
 	target_compile_options(Cala PUBLIC /W4 /Ot)

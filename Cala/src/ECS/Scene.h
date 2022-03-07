@@ -18,8 +18,7 @@ public:
 
 	template<class T> T& getComponent(Entity entityID);
 	template<class T> const T& getComponent(Entity entityID) const;
-	template<class T>
-	Cala::IterableVector<Entity> getComponentEntityList() const;
+	template<class T> Cala::IterableVector<Entity> getComponentEntityList() const;
 	template<class T, typename ...Args> void addComponent(Entity entityID, Args&&... args);
 	template<class T> void shareComponent(Entity sharingEntityID, Entity receivingEntityID);
 	template<class T> bool hasComponent(Entity entityID) const;
@@ -93,10 +92,6 @@ inline void Scene::addComponent(Entity entityID, Args&& ...args)
 	// Modifying entity component table
 	entityComponentTable.vector[entityID].first.set(componentID, true);
 	entityComponentTable.vector[entityID].second[componentID] = (ComponentIndex)(components.vector.size() - 1);
-
-	if (std::is_same<T, RenderingComponent>())
-		addComponent<TransformComponent>(entityID);
-	//return components[components.size() - 1].component;
 }
 
 template<class T>

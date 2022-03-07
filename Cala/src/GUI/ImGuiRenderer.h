@@ -1,15 +1,13 @@
 #pragma once
 #include "ImGuiWindow.h"
 #include "Core/Window.h"
-#include <list>
 
-class UserInterface {
+class ImGuiRenderer {
 public:
-	UserInterface(const Window& window);
-	~UserInterface();
+	ImGuiRenderer(const Window& window);
+	~ImGuiRenderer();
 	void beginFrame() const;
 	void endFrame() const;
-	void addLabel(const char* label) const;
 	
 private:
 	static bool imGuiInitialized;

@@ -12,7 +12,7 @@ public:
 	void gameLoop();
 	virtual void run() = 0;
 	virtual void update() = 0;
-	virtual void onWindowResize(const glm::ivec2 windowSize) = 0;
+	virtual void onWindowResize(const glm::ivec2& windowSize) = 0;
 	virtual bool shouldExit();
 
 protected:

@@ -1,6 +1,7 @@
 set (editorFiles
-	src/Editor/Editor.cpp 	src/Editor/Editor.h
-	src/Editor/EntryPoint.cpp
+	src/Editor.cpp 	src/Editor.h
+	src/EntryPoint.cpp
+	src/UIComponentProcessor.h
 )
 
 add_executable(Calion

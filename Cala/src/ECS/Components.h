@@ -6,6 +6,7 @@
 #include "Graphics/Texture.h"
 #include <glm/gtc/quaternion.hpp>
 #include <glm/vec3.hpp>
+#include <set>
 
 class Scene;
 namespace Cala { struct Time; }
@@ -29,7 +30,7 @@ struct Component {
 };
 
 struct TagComponent : public Component {
-	TagComponent(const std::string& tagName) : name(tagName) {}
+	TagComponent(const std::string& tagName = "") : name(tagName) {}
 	~TagComponent() override = default;
 	std::string name;
 };
@@ -82,6 +83,7 @@ public:
 	};
 
 	ScriptingComponent(Script* script) : scriptPointer(script) {}
+	ScriptingComponent() = default;
 	~ScriptingComponent() = default;
 	void attachScript(Script* script) { scriptPointer.reset(script); }
 	const Shared<Script>& getScript() const { return scriptPointer; }
