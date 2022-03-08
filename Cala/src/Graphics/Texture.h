@@ -45,6 +45,8 @@ public:
 public:
 	Texture() = default;
 	virtual ~Texture() = default;
+	const std::string& getImagePath() const { return imagePath; }
+	glm::ivec2 getImageDimensions() const { return glm::ivec2(width, height); }
 	virtual void setForSampling(uint32_t bindingIndex) const = 0;
 	virtual void setForWriting(uint32_t bindingIndex) const = 0;
 	virtual void load2DTexture(const Image& image, const TextureSpecification& specification) = 0;
@@ -59,5 +61,6 @@ private:
 protected:
 	int width = 0;
 	int height = 0;
+	std::string imagePath;
 };
 

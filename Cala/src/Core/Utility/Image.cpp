@@ -31,6 +31,7 @@ void Image::loadImage(const std::filesystem::path& path)
 		return;
 	}
 
+	this->path = path.string();
 	data = stbi_load(path.string().c_str(), &width, &height, &channelCount, 0);
 
 	if (data == nullptr)

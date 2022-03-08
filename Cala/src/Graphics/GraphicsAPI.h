@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
-#include "Shader.h"
 #include "Mesh.h"
+#include "Shader.h"
 #include "Framebuffer.h"
 #include "Texture.h"
 #include "ConstantBuffer.h"
@@ -17,12 +17,13 @@ public:
 	};
 
 public:
+	static GraphicsAPI* construct(API api);
+	static Texture* createTexture();
+	static Framebuffer* createFramebuffer();
+	static Shader* createShader();
+	static Mesh* createMesh();
+	static ConstantBuffer* createConstantBuffer();
 	virtual ~GraphicsAPI() = default;
-	virtual Shader* createShader() const = 0;
-	virtual Mesh* createMesh() const = 0;
-	virtual ConstantBuffer* createConstantBuffer() const = 0;
-	virtual Texture* createTexture() const = 0;
-	virtual Framebuffer* createFramebuffer() const = 0;
 	virtual void render(const Mesh* mesh) const = 0;
 	virtual void renderInstances(const Mesh* mesh, uint32_t drawCount) const = 0;
 	virtual void setBufferClearingColor(const glm::vec4& color) const = 0;
@@ -75,4 +76,5 @@ protected:
 	virtual uint32_t mapConstant(Constant constant) const = 0;
 	uint32_t bufferClearingBitmask = 0;
 	static bool initialized;
+	static API api;
 };

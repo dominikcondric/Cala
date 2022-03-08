@@ -7,15 +7,13 @@
 
 class Editor : public BaseApplication {
 public:
-	Editor(const Window::WindowSpecification& windowSpec, Cala::RenderingAPI api = Cala::RenderingAPI::OpenGL);
+	Editor(const Window::WindowSpecification& windowSpec, GraphicsAPI::API api = GraphicsAPI::API::OpenGL);
 	~Editor() override = default;
 	void run();
 	void update() override;
 	void onWindowResize(const glm::ivec2& windowSize) override;
 
 private:
-	using ComponentUIFunction = void (*)(Scene&, Entity);
-
 	void drawGUI();
 	void arrangeGUI();
 	void renderRendererStateOptions();
@@ -29,6 +27,8 @@ private:
 	ImGuiWindow leftPanel;
 	ImGuiWindow topPanel;
 	ImGuiWindow rightPanel;
+
+	bool demoSceneLoaded = false;
 
 	bool mouseHovered = false;
 	bool guiUsed = false;

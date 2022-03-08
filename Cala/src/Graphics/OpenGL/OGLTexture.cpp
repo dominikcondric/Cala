@@ -68,6 +68,8 @@ void OGLTexture::loadCubemap(const std::array<Image, 6>& images, const TextureSp
 
 void OGLTexture::load2DTexture(const Image& image, const TextureSpecification& specification)
 {
+	imagePath = image.getPath();
+
 	Format format;
 	if (image.getChannelCount() == 4)
 		format = Format::RGBA;

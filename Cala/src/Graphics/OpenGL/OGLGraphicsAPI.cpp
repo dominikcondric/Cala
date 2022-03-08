@@ -8,8 +8,6 @@
 #include "OGLFramebuffer.h"
 #include <GLFW/glfw3.h>
 
-bool GraphicsAPI::initialized = false;
-
 void OGLGraphicsAPI::setBufferClearingColor(const glm::vec4& color) const
 {
 	glClearColor(color.x, color.y, color.z, color.w);
@@ -113,8 +111,12 @@ void OGLGraphicsAPI::clearFramebuffer() const
 
 OGLGraphicsAPI* OGLGraphicsAPI::construct()
 {
-	if (!initialized) 
+	if (!initialized)
+	{
+		initialized = true;
+		api = API::OpenGL;
 		return new OGLGraphicsAPI();
+	}
 
 	return nullptr;
 }
@@ -140,31 +142,6 @@ void OGLGraphicsAPI::renderInstances(const Mesh* mesh, uint32_t drawCount) const
 OGLGraphicsAPI::~OGLGraphicsAPI()
 {
 	initialized = false;
-}
-
-Shader* OGLGraphicsAPI::createShader() const
-{
-	return new OGLShader();
-}
-
-Mesh* OGLGraphicsAPI::createMesh() const
-{
-	return new OGLMesh();
-}
-
-ConstantBuffer* OGLGraphicsAPI::createConstantBuffer() const
-{
-	return new OGLConstantBuffer();
-}
-
-Texture* OGLGraphicsAPI::createTexture() const
-{
-	return new OGLTexture();
-}
-
-Framebuffer* OGLGraphicsAPI::createFramebuffer() const
-{
-	return new OGLFramebuffer();
 }
 
 uint32_t OGLGraphicsAPI::mapConstant(Constant constant) const

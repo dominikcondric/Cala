@@ -1,21 +1,21 @@
 #include "Graphics/OpenGL/OGLGraphicsAPI.h"
 #include "BaseApplication.h"
 
-BaseApplication::BaseApplication(const Window::WindowSpecification& windowSpec, Cala::RenderingAPI api) : mainWindow(windowSpec)
+BaseApplication::BaseApplication(const Window::WindowSpecification& windowSpec, GraphicsAPI::API api) : mainWindow(windowSpec)
 {
 	switch (api)
 	{
-	case Cala::RenderingAPI::OpenGL:
+	case  GraphicsAPI::API::OpenGL:
 		mainWindow.createOpenGLContext();
-		renderer = Unique<OGLGraphicsAPI>(OGLGraphicsAPI::construct());
+		renderer = Unique<GraphicsAPI>(GraphicsAPI::construct(GraphicsAPI::API::OpenGL));
 		break;
-	case Cala::RenderingAPI::Direct3D:
+	case  GraphicsAPI::API::Direct3D:
 		LOG("Direct3D not implemented yet. Loading OpenGL.");
-		renderer = Unique<OGLGraphicsAPI>(OGLGraphicsAPI::construct());
+		renderer = Unique<GraphicsAPI>(GraphicsAPI::construct(GraphicsAPI::API::OpenGL));
 		break;
-	case Cala::RenderingAPI::Vulkan:
+	case  GraphicsAPI::API::Vulkan:
 		LOG("Vulkan not implemented yet. Loading OpenGL.");
-		renderer = Unique<OGLGraphicsAPI>(OGLGraphicsAPI::construct());
+		renderer = Unique<GraphicsAPI>(GraphicsAPI::construct(GraphicsAPI::API::OpenGL));
 		break;
 	}
 

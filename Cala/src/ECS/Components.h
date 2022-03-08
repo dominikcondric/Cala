@@ -66,8 +66,8 @@ struct LightComponent : public Component {
 	};
 
 	LightSourceType type;
-	float strength{ 1.f };
-	float coneCutoff{ 12.5f };
+	float intensity{ 1.f };
+	float coneCutoff{ glm::radians(12.5f) };
 	glm::vec3 color{ 1.f };
 };
 

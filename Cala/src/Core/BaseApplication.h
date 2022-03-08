@@ -7,7 +7,7 @@
 
 class BaseApplication {
 public:
-	BaseApplication(const Window::WindowSpecification& windowSpec, Cala::RenderingAPI api);
+	BaseApplication(const Window::WindowSpecification& windowSpec, GraphicsAPI::API api);
 	virtual ~BaseApplication() = default;
 	void gameLoop();
 	virtual void run() = 0;

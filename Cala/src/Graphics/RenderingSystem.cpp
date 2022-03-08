@@ -20,49 +20,49 @@ void RenderingSystem::initialize(GraphicsAPI* api)
 
 	std::filesystem::path shadersPath = Cala::getProjectPath() / "Cala/src/Shaders/";
 
-	generalShader = Unique<Shader>(renderer->createShader());
+	generalShader = Unique<Shader>(GraphicsAPI::createShader());
 	generalShader->attachShader(Shader::ShaderType::VertexShader, shadersPath / "GeneralVertexShader.glsl");
 	generalShader->attachShader(Shader::ShaderType::FragmentShader, shadersPath / "GeneralFragmentShader.glsl");
 	generalShader->createProgram();
 
-	cameraTransforms.reset(renderer->createConstantBuffer());
+	cameraTransforms.reset(GraphicsAPI::createConstantBuffer());
 	cameraTransforms->setData(generalShader->getConstantBufferInfo("MVP"), true);
 	
-	materialsBuffer.reset(renderer->createConstantBuffer());
+	materialsBuffer.reset(GraphicsAPI::createConstantBuffer());
 	materialsBuffer->setData(generalShader->getConstantBufferInfo("ModelData"), true);
 	uint32_t shadows = 0;
 	materialsBuffer->updateData("shadows", &shadows, sizeof(uint32_t));
 
-	lightsBuffer.reset(renderer->createConstantBuffer());
+	lightsBuffer.reset(GraphicsAPI::createConstantBuffer());
 	lightsBuffer->setData(generalShader->getConstantBufferInfo("LightData"), true);
 
-	skyboxShader = Unique<Shader>(renderer->createShader());
+	skyboxShader = Unique<Shader>(GraphicsAPI::createShader());
 	skyboxShader->attachShader(Shader::ShaderType::VertexShader, shadersPath / "SkyboxVertexShader.glsl");
 	skyboxShader->attachShader(Shader::ShaderType::FragmentShader, shadersPath / "SkyboxFragmentShader.glsl");
 	skyboxShader->createProgram();
 
-	skyboxBlurBuffer.reset(renderer->createConstantBuffer());
+	skyboxBlurBuffer.reset(GraphicsAPI::createConstantBuffer());
 	skyboxBlurBuffer->setData(skyboxShader->getConstantBufferInfo("SkyboxBlur"), false);
 
-	helperGrid.shader = Unique<Shader>(renderer->createShader());
+	helperGrid.shader = Unique<Shader>(GraphicsAPI::createShader());
 	helperGrid.shader->attachShader(Shader::ShaderType::VertexShader, shadersPath / "BaseMeshVertexShader.glsl");
 	helperGrid.shader->attachShader(Shader::ShaderType::GeometryShader, shadersPath / "BaseMeshGeometryShader.glsl");
 	helperGrid.shader->attachShader(Shader::ShaderType::FragmentShader, shadersPath / "BaseMeshFragmentShader.glsl");
 	helperGrid.shader->createProgram();
 
-	postProcessingUtility.shader = Unique<Shader>(renderer->createShader());
+	postProcessingUtility.shader = Unique<Shader>(GraphicsAPI::createShader());
 	postProcessingUtility.shader->attachShader(Shader::ShaderType::VertexShader, shadersPath / "PostProcessingVertexShader.glsl");
 	postProcessingUtility.shader->attachShader(Shader::ShaderType::FragmentShader, shadersPath / "PostProcessingFragmentShader.glsl");
 	postProcessingUtility.shader->createProgram();
 
-	postProcessingUtility.effectsBuffer.reset(renderer->createConstantBuffer());
+	postProcessingUtility.effectsBuffer.reset(GraphicsAPI::createConstantBuffer());
 	postProcessingUtility.effectsBuffer->setData(postProcessingUtility.shader->getConstantBufferInfo("EffectValues"), true);
 	
-	postProcessingUtility.helperFramebuffers[0].reset(renderer->createFramebuffer());
+	postProcessingUtility.helperFramebuffers[0].reset(GraphicsAPI::createFramebuffer());
 	postProcessingUtility.helperFramebuffers[0]->generateRenderingTarget(1024, 768, 1);
-	postProcessingUtility.helperFramebuffers[1].reset(renderer->createFramebuffer());
+	postProcessingUtility.helperFramebuffers[1].reset(GraphicsAPI::createFramebuffer());
 	postProcessingUtility.helperFramebuffers[1]->generateColorBuffer(1024, 768, 1);
-	postProcessingUtility.helperFramebuffers[2].reset(renderer->createFramebuffer());
+	postProcessingUtility.helperFramebuffers[2].reset(GraphicsAPI::createFramebuffer());
 	postProcessingUtility.helperFramebuffers[2]->generateColorBuffer(1024, 768, 1);
 
 	postProcessingUtility.effectsValues[PostProcessingEffect::BoxBlur] = 400.f;
@@ -72,7 +72,7 @@ void RenderingSystem::initialize(GraphicsAPI* api)
 	postProcessingUtility.effectsValues[PostProcessingEffect::Bloom] = 2.f;
 
 	// Skybox cube
-	skyboxMesh.reset(renderer->createMesh());
+	skyboxMesh.reset(GraphicsAPI::createMesh());
 	skyboxMesh->loadCube();
 
 	// renderingQuad
@@ -83,7 +83,7 @@ void RenderingSystem::initialize(GraphicsAPI* api)
 		1.f, -1.f, 1.f, 0.f
 	};
 	
-	postProcessingUtility.renderingQuad.reset(renderer->createMesh());
+	postProcessingUtility.renderingQuad.reset(GraphicsAPI::createMesh());
 	Mesh* renderingQuad = postProcessingUtility.renderingQuad.get();
 	renderingQuad->setDrawingMode(Mesh::DrawingMode::TriangleStrip);
 	std::vector<Mesh::VertexLayoutSpecification> modelLayouts;
@@ -98,7 +98,7 @@ void RenderingSystem::initialize(GraphicsAPI* api)
 		0.f, 0.f, -1.f
 	};
 
-	helperGrid.mesh.reset(renderer->createMesh());
+	helperGrid.mesh.reset(GraphicsAPI::createMesh());
 	Mesh* helperGridMesh = helperGrid.mesh.get();
 	modelLayouts.clear();
 	modelLayouts.push_back({ 0, 3, 0, 0, 1 });
@@ -242,7 +242,7 @@ void RenderingSystem::render(const Scene& scene, const Camera& cam)
 		if (postProcessingUtility.effectsStates.test(HDR) && scene.hasComponent<LightComponent>(entity))
 		{
 			RenderingComponent copy = renderingComp;
-			copy.color *= scene.getComponent<LightComponent>(entity).strength;
+			copy.color *= scene.getComponent<LightComponent>(entity).intensity;
 			drawColored(copy, transformComp);
 		}
 		else
@@ -394,6 +394,7 @@ void RenderingSystem::drawLightenedTextured(const RenderingComponent& renderingC
 	else
 	{
 		drawLightened(renderingComp, transformComp);
+		return;
 	}
 
 	if (textureComp.specularMap != nullptr)
@@ -478,7 +479,7 @@ void RenderingSystem::updateShaderLight(const LightComponent& light, const Trans
 	{
 		case LightComponent::LightSourceType::Point:
 		{
-			color = light.strength * light.color;
+			color = light.intensity * light.color;
 			direction = glm::vec3(0.f, 0.f, 0.f);
 			constant = 1.1f;
 			linear = 0.024f;
@@ -488,7 +489,7 @@ void RenderingSystem::updateShaderLight(const LightComponent& light, const Trans
 		}
 		case LightComponent::LightSourceType::Directional:
 		{
-			color = glm::vec4(light.strength * light.color, 1.f);
+			color = glm::vec4(light.intensity * light.color, 1.f);
 			direction = glm::vec3(0.f, -1.f, 0.f);
 			constant = 0.f;
 			linear = 0.f;
@@ -498,12 +499,12 @@ void RenderingSystem::updateShaderLight(const LightComponent& light, const Trans
 		}
 		case LightComponent::LightSourceType::Cone:
 		{
-			color = glm::vec4(light.strength * light.color, 1.f);
+			color = glm::vec4(light.intensity * light.color, 1.f);
 			direction = glm::vec4(glm::vec3(transform.getRotationMatrix() * glm::vec4(0.f, -1.f, 0.f, 0.f)), 0.f);
 			constant = 1.f;
 			linear = 0.045f;
 			quadratic = 0.0075f;
-			cutoff = glm::cos(glm::radians(light.coneCutoff));
+			cutoff = glm::cos(light.coneCutoff);
 			break;
 		}
 	}

@@ -25,5 +25,5 @@ void processComponents(Processor& processor)
 template<class Processor>
 void processAllComponents(Processor& processor)
 {
-	processComponents<Processor, RenderingComponent, TextureComponent, LightComponent, TagComponent, ScriptingComponent, TransformComponent>(processor);
+	processComponents<Processor, RenderingComponent, TextureComponent, LightComponent, TagComponent, ScriptingComponent, TransformComponent, SkyboxComponent>(processor);
 }

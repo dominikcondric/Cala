@@ -5,8 +5,8 @@
 #define ROTATION_SPEED (2 * deltaTime)
 #define TRANSLATION_SPEED (14 * deltaTime)
 
-Editor::Editor(const Window::WindowSpecification& windowSpec, Cala::RenderingAPI api) : BaseApplication(windowSpec, api), gui(mainWindow),
-leftPanel("Left panel"), topPanel("Menu bar"), rightPanel("RightPanel"), uiComponentProcessor(mainScene, -1, renderer.get())
+Editor::Editor(const Window::WindowSpecification& windowSpec, GraphicsAPI::API api) : BaseApplication(windowSpec, api), gui(mainWindow),
+leftPanel("Left panel"), topPanel("Menu bar"), rightPanel("RightPanel"), uiComponentProcessor(mainScene, -1, mainWindow, renderer.get())
 {
 	glm::ivec2 winSize = mainWindow.getWindowSize();
 	cam.setProjectionAspectRatio((float)winSize.x / winSize.y);
@@ -179,6 +179,32 @@ void Editor::renderRendererStateOptions()
 void Editor::renderEntitiesList()
 {
 	ImGui::BeginChild("##Entity list", ImVec2(0.f, ImGui::GetWindowHeight() / 2.f));
+
+	if (!demoSceneLoaded && ImGui::Button("Load demo scene", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
+	{
+		Entity cube = mainScene.addEntity("Cube");
+		mainScene.addComponent<RenderingComponent>(cube);
+		RenderingComponent& cubeRenderingComp = mainScene.getComponent<RenderingComponent>(cube);
+		cubeRenderingComp.mesh.reset(GraphicsAPI::createMesh());
+		cubeRenderingComp.mesh->loadCube();
+
+		Entity light = mainScene.addEntity("Light");
+		mainScene.addComponent<RenderingComponent>(light);
+		RenderingComponent& lightRenderingComp = mainScene.getComponent<RenderingComponent>(light);
+		lightRenderingComp.mesh.reset(GraphicsAPI::createMesh());
+		lightRenderingComp.mesh->loadSphere();
+		lightRenderingComp.color = glm::vec4(1.f);
+		lightRenderingComp.lightened = false;
+
+		auto& lightTransformComp = mainScene.getComponent<TransformComponent>(light);
+		lightTransformComp.translate(glm::vec3(2.f, 2.f, 1.f));
+		lightTransformComp.scale(glm::vec3(0.2f));
+
+		mainScene.addComponent<LightComponent>(light);
+
+		demoSceneLoaded = true;
+	}
+
 	if (ImGui::CollapsingHeader("Entities list"))
 	{
 		ImGui::PushTextWrapPos();
@@ -222,7 +248,7 @@ void Editor::renderEntitiesList()
 			ImGui::SameLine();
 			if (ImGui::Button("+", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
 			{
-				uiComponentProcessor.addComponent();
+				uiComponentProcessor.addSelectedComponent();
 			}
 
 			if (ImGui::Button("Delete entity", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
@@ -254,7 +280,7 @@ void Editor::renderComponentList()
 	ImGui::BeginChild("##Entity component list", ImVec2(0.f, ImGui::GetWindowHeight() / 2.f));
 	if (selectedEntity != -1) 
 	{
-		uiComponentProcessor.createComponentUI(time.deltaTime);
+		uiComponentProcessor.createSelectedComponentUI(time.deltaTime);
 	}
 	ImGui::EndChild();
 	ImGui::PopTextWrapPos();

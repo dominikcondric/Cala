@@ -13,10 +13,12 @@ public:
 	glm::ivec2 getDimensions() const { return glm::ivec2(width, height); }
 	int getChannelCount() const { return channelCount; }
 	const unsigned char* getData() const { return data; }
+	const std::string& getPath() const { return path; }
 
 private:
 	int height = 0;
 	int width = 0;
 	int channelCount = 0;
 	unsigned char* data = nullptr;
+	std::string path;
 };

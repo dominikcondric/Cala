@@ -19,6 +19,5 @@ template<typename T> using Unique = std::unique_ptr<T>;
 template<typename T> using Shared = std::shared_ptr<T>;
 
 namespace Cala {
-	enum class RenderingAPI { OpenGL, Direct3D, Vulkan };
 	void sleep(uint64_t miliseconds);
 }

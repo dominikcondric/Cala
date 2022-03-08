@@ -6,11 +6,6 @@ class OGLGraphicsAPI : public GraphicsAPI {
 public:
 	static OGLGraphicsAPI* construct();
 	~OGLGraphicsAPI() override;
-	Shader* createShader() const override;
-	Mesh* createMesh() const override;
-	ConstantBuffer* createConstantBuffer() const override;
-	Texture* createTexture() const override;
-	Framebuffer* createFramebuffer() const override;
 	void render(const Mesh* mesh) const override;
 	void renderInstances(const Mesh* mesh, uint32_t drawCount) const override;
 	void enableSetting(Constant setting) const override;
@@ -37,5 +32,6 @@ private:
 	void drawIndexed(const GLuint drawingMode, const GLuint indicesCount) const override;
 	void drawInstanced(const GLuint drawingMode, const GLuint verticesCount, const GLuint instancesCount) const override;
 	void drawIndexedInstanced(const GLuint drawingMode, const GLuint indicesCount, const GLuint instancesCount) const override;
+
 };
 
