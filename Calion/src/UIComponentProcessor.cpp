@@ -13,8 +13,6 @@ void UIComponentProcessor::setEntity(Entity entityID)
 	compModifyFunction = nullptr;
 	selectedComponent = nullptr;
 	previewComponent = nullptr;
-	positiveHasComponentCheck = false;
-	processAllComponents(*this);
 }
 
 void UIComponentProcessor::addSelectedComponent()

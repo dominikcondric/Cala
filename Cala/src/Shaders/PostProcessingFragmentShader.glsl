@@ -144,25 +144,9 @@ vec4 extract()
 	const vec3 intensityWeights = vec3(0.2126f, 0.7152f, 0.0722f);
 
 	if (dot(intensityWeights, texSample) >= 1.f) 
-	{
 		return vec4(texSample, 1.f);
-	}
 	else
-	{
-		/* vec2 pixelSize = 1.f / textureSize(scene, 0);
-		for (int i = 0; i < 10; ++i)
-		{
-			for (int j = 0; j < 10; ++j)
-			{
-				const vec3 firstSample = texture(scene, vec2(texCoords.x + pixelSize.x * i, texCoords.y + pixelSize.y * j)).rgb;
-				const vec3 secondSample = texture(scene, vec2(texCoords.x - pixelSize.x * i, texCoords.y - pixelSize.y * j)).rgb;
-				if (dot(intensityWeights, firstSample) >= 1.f || dot(intensityWeights, secondSample) >= 1.f)
-					return vec4(0.f, 0.f, 0.f, 1.f);
-			}
-		}		 */
-
-		return vec4(0.f);
-	}
+		return vec4(0.f, 0.f, 0.f, 1.f);
 }
 
 void main()

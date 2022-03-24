@@ -4,6 +4,7 @@
 #include "Graphics/RenderingSystem.h"
 #include "Core/Utility/FileDialog.h"
 #include "UIComponentProcessor.h"
+#include "ECS/SceneSerializer.h"
 
 class Editor : public BaseApplication {
 public:
@@ -19,6 +20,7 @@ private:
 	void renderRendererStateOptions();
 	void renderEntitiesList();
 	void renderComponentList();
+	void renderPostProcessingEffects();
 	void repositionElements();
 	bool isCursorInsideViewport() const;
 		
@@ -27,8 +29,6 @@ private:
 	ImGuiWindow leftPanel;
 	ImGuiWindow topPanel;
 	ImGuiWindow rightPanel;
-
-	bool demoSceneLoaded = false;
 
 	bool mouseHovered = false;
 	bool guiUsed = false;
@@ -40,4 +40,8 @@ private:
 
 	// Component editing
 	UIComponentProcessor uiComponentProcessor;
+
+	// Scene serialization
+	SceneSerializer sceneSerializer;
+	FileDialog sceneLoadingDialog;
 };

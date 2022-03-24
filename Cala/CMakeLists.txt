@@ -18,16 +18,18 @@ set (srcFiles
 	src/ECS/ComponentDatabase.h
 	src/ECS/ConsistentComponentVector.h
 	src/ECS/ComponentIterator.h
+	src/ECS/SceneSerializerTemplates.h
+	src/ECS/SceneSerializer.h		src/ECS/SceneSerializer.cpp
 	src/ECS/Components.cpp 			src/ECS/Components.h
 	src/ECS/Scene.cpp 				src/ECS/Scene.h
 
 	src/Graphics/RenderingSystem.h	src/Graphics/RenderingSystem.cpp
 	src/Graphics/Camera.h			src/Graphics/Camera.cpp
 	src/Graphics/Mesh.h				src/Graphics/Mesh.cpp
+	src/Graphics/GraphicsAPI.h		src/Graphics/GraphicsAPI.cpp
 	src/Graphics/Texture.h
 	src/Graphics/ConstantBuffer.h
 	src/Graphics/Framebuffer.h
-	src/Graphics/GraphicsAPI.h
 	src/Graphics/Shader.h
 
 	src/Graphics/OpenGL/OGLConstantBuffer.cpp	src/Graphics/OpenGL/OGLConstantBuffer.h
@@ -87,6 +89,7 @@ target_include_directories(Cala
 		src/
 		${CMAKE_SOURCE_DIR}/Dependencies/glm
 		${CMAKE_CURRENT_BINARY_DIR}/src
+		${CMAKE_SOURCE_DIR}/Dependencies/RapidXML
 	PRIVATE
 		${CMAKE_SOURCE_DIR}/Dependencies/ImageLoader
 )

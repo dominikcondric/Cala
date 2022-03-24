@@ -15,17 +15,20 @@ public:
 	~Scene() = default;
 	Entity addEntity(const std::string& entTag = "");
 	void removeEntity(Entity entityID);
+	void clearEntities();
+	bool entityExists(Entity entityID) const;
 
 	template<class T> T& getComponent(Entity entityID);
 	template<class T> const T& getComponent(Entity entityID) const;
 	template<class T> Cala::IterableVector<Entity> getComponentEntityList() const;
 	template<class T, typename ...Args> void addComponent(Entity entityID, Args&&... args);
+	template<class T, typename ...Args> T& addAndReturnComponent(Entity entityID, Args&&... args);
 	template<class T> void shareComponent(Entity sharingEntityID, Entity receivingEntityID);
 	template<class T> bool hasComponent(Entity entityID) const;
 	template<class T> void removeComponent(Entity entityID);
 
 private:
-	static const uint32_t MAX_COMPONENTS = 10;
+	static const int MAX_COMPONENTS = 10;
 
 	// Component managing
 	mutable ComponentDatabase componentDB;
@@ -94,6 +97,13 @@ inline void Scene::addComponent(Entity entityID, Args&& ...args)
 	entityComponentTable.vector[entityID].second[componentID] = (ComponentIndex)(components.vector.size() - 1);
 }
 
+template<class T, typename ...Args>
+inline T& Scene::addAndReturnComponent(Entity entityID, Args&& ...args)
+{
+	addComponent<T>(entityID, std::forward<Args>(args)...);
+	return getComponent<T>(entityID);
+}
+
 template<class T>
 inline void Scene::shareComponent(Entity sharingEntityID, Entity receivingEntityID)
 {
@@ -125,6 +135,7 @@ template<class T>
 inline bool Scene::hasComponent(Entity entityID) const
 {
 	static_assert(std::is_base_of<Component, T>(), "T is not derived from Component!");
+	assert(entityExists(entityID));
 
 	const auto& entCompTable = entityComponentTable.vector[entityID].first;
 	return entCompTable.test(componentDB.getComponentID<T>());
@@ -148,7 +159,7 @@ inline void Scene::removeComponent(Entity entityID)
 	{
 		components.erase(componentIndex);
 
-		if (!components.vector.empty() && componentIndex != components.vector.size())
+		if (!components.vector.empty() && (std::size_t)componentIndex != components.vector.size())
 		{
 			for (Entity entity : components.vector[componentIndex].entities)
 			{

@@ -121,6 +121,7 @@ inline void UIComponentProcessor::createComponentUI<RenderingComponent>(float)
 	ImGui::Checkbox("Lightened", &component.lightened);
 	ImGui::Checkbox("Culled", &component.culled);
 	ImGui::Checkbox("Outlined", &component.outlined);
+	ImGui::Checkbox("Wireframe", &component.wireframe);
 	float* pickedColor = &component.color.x;
 	ImGui::ColorPicker4("##", pickedColor, ImGuiColorEditFlags_NoLabel);
 	if (ImGui::BeginCombo("Model", previewModel))
@@ -203,6 +204,7 @@ inline void UIComponentProcessor::createComponentUI<LightComponent>(float deltaT
 	ImGui::Indent();
 	ImGui::ColorEdit3("##LightColor", &component.color.x);
 	ImGui::Unindent();
+	createRemoveComponentButton<LightComponent>();
 }
 
 template<>
@@ -279,8 +281,8 @@ inline void UIComponentProcessor::createComponentUI<TextureComponent>(float delt
 	}
 	ImGui::Unindent();
 	ImGui::PopTextWrapPos();
+	createRemoveComponentButton<TextureComponent>();
 }
-
 
 template<>
 inline void UIComponentProcessor::createComponentUI<TransformComponent>(float deltaTime)
@@ -333,3 +335,38 @@ inline void UIComponentProcessor::createComponentUI<TransformComponent>(float de
 		component.rotate(rotation.z * deltaTime, glm::vec3(0.f, 0.f, 1.f));
 	}
 }
+
+template<>
+inline void UIComponentProcessor::createComponentUI<SkyboxComponent>(float deltaTime)
+{
+	SkyboxComponent& component = scene.getComponent<SkyboxComponent>(entity);
+	Texture::TextureSpecification texSpec;
+	texSpec.gammaCorrection = api->getSettingState(GraphicsAPI::GammaCorrection);
+
+	ImGui::PushTextWrapPos();
+	ImGui::Text("Texture:");
+	ImGui::Indent();
+	if (component.texture != nullptr)
+	{
+		ImGui::Text(component.texture->getImagePath().c_str());
+		if (ImGui::Button("Remove##texture", ImVec2(ImGui::GetContentRegionAvailWidth() / 2.f, 0.f)))
+			component.texture = nullptr;
+	}
+	//else
+	//{
+	//	if (ImGui::Button("Add##texture", ImVec2(ImGui::GetContentRegionAvailWidth() / 2.f, 0.f)))
+	//	{
+	//		std::string imagePath = texturesFileDialog.openFile();
+	//		if (!imagePath.empty())
+	//		{
+	//			component.texture.reset(GraphicsAPI::createTexture());
+	//			std::array<Image, 6> cubemapImages;
+	//			//component.texture->loadCubemap(, texSpec);
+	//		}
+	//	}
+	//}
+	ImGui::Unindent();
+	ImGui::PopTextWrapPos();
+	createRemoveComponentButton<SkyboxComponent>();
+}
+

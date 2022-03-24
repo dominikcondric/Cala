@@ -31,7 +31,7 @@ void Scene::removeEntity(Entity entityID)
 	entityComponentTable.erase(entityID);
 
 	size_t entCompTableSize = entityComponentTable.size();
-	if (entCompTableSize != 0 && entCompTableSize != entityID)
+	if (entCompTableSize != 0 && entCompTableSize != (std::size_t)entityID)
 	{
 		void (*lastElementInsertionSort)(std::vector<Entity>&) = [](std::vector<Entity>& vector) {
 			const Entity lastElement = vector.back();
@@ -63,4 +63,20 @@ void Scene::removeEntity(Entity entityID)
 			}
 		}
 	}
+}
+
+void Scene::clearEntities()
+{
+	if (!entityComponentTable.vector.empty())
+	{
+		for (int i = entityComponentTable.size() - 1; i >= 0; --i)
+		{
+			removeEntity(i);
+		}
+	}
+}
+
+bool Scene::entityExists(Entity entityID) const
+{
+	return (std::size_t)entityID < entityComponentTable.vector.size();
 }

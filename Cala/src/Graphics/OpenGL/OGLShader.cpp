@@ -55,6 +55,7 @@ void OGLShader::attachShader(ShaderType shaderStage, const std::filesystem::path
 		std::stringstream shaderStream;
 		shaderStream << shaderFile.rdbuf();
 		shaderCode = shaderStream.str();
+		shaderFile.close();
 	}
 	catch (std::ifstream::failure& e) {
 		std::cout << e.what() << std::endl;

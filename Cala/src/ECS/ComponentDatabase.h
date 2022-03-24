@@ -22,7 +22,7 @@ public:
 
 	BaseConsistentComponentVector& getBaseComponentVectorByID(ComponentID compID) 
 	{
-		assert(compID < componentList.size()); 
+		assert((std::size_t)compID < componentList.size()); 
 		return *componentList[compID]; 
 	}
 

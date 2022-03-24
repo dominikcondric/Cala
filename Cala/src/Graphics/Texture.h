@@ -61,6 +61,6 @@ private:
 protected:
 	int width = 0;
 	int height = 0;
-	std::string imagePath;
+	std::string imagePath = "";
 };
 

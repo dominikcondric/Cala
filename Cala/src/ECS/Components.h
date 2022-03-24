@@ -12,7 +12,7 @@ class Scene;
 namespace Cala { struct Time; }
 class IOSystem;
 
-using ComponentID = uint32_t;
+using ComponentID = int;
 using ComponentIndex = int;
 using Entity = int;
 
@@ -102,6 +102,7 @@ public:
 	const glm::mat4& getTransformMatrix() const { return transformMatrix; }
 	const glm::vec3& getTranslation() const { return translationVector; }
 	const glm::vec3& getScale() const { return scaleVector; }
+	const glm::quat& getRotationQuat() const { return rotationQuat; }
 	const glm::mat4 getRotationMatrix() const { return glm::mat4_cast(rotationQuat); }
 
 private:
@@ -129,6 +130,5 @@ struct SkyboxComponent : public Component {
 	SkyboxComponent() = default;
 	~SkyboxComponent() override = default;
 	int blurLevel = 200;
-	int brightness = 1;
 	Shared<Texture> texture;
 };

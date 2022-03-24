@@ -6,7 +6,8 @@
 #define TRANSLATION_SPEED (14 * deltaTime)
 
 Editor::Editor(const Window::WindowSpecification& windowSpec, GraphicsAPI::API api) : BaseApplication(windowSpec, api), gui(mainWindow),
-leftPanel("Left panel"), topPanel("Menu bar"), rightPanel("RightPanel"), uiComponentProcessor(mainScene, -1, mainWindow, renderer.get())
+leftPanel("Left panel"), topPanel("Menu bar"), rightPanel("RightPanel"), uiComponentProcessor(mainScene, -1, mainWindow, renderer.get()),
+sceneLoadingDialog(mainWindow)
 {
 	glm::ivec2 winSize = mainWindow.getWindowSize();
 	cam.setProjectionAspectRatio((float)winSize.x / winSize.y);
@@ -24,10 +25,11 @@ leftPanel("Left panel"), topPanel("Menu bar"), rightPanel("RightPanel"), uiCompo
 	rightPanel.setWindowMinSize(ImVec2(winSize.x / 7.f, winSize.y - winSize.y / 20.f));
 	repositionElements();
 
-	std::filesystem::path texturesPath = Cala::getProjectPath() / "Calion/Textures/";
-
 	cam.setPosition(glm::vec3(0.f, 5.f, 10.f));
 	cam.setCenter({ 0.f, 0.f, 0.f });
+
+	sceneLoadingDialog.setInitialDirectory((Cala::getProjectPath() / "Calion/Scenes/").string());
+	sceneLoadingDialog.setFilters("Cala scene (.csn)\0*.csn\0\0");
 }
 
 void Editor::run()
@@ -139,11 +141,82 @@ void Editor::arrangeGUI()
 
 	rightPanel.beginWindow();
 	renderRendererStateOptions();
+	renderPostProcessingEffects();
 	rightPanel.endWindow();
+}
+
+void Editor::renderPostProcessingEffects()
+{
+	ImGui::BeginChild("##PostProcessingEffects", ImVec2(0.f, ImGui::GetWindowHeight() / 2.f));
+	ImGui::Text("Post processing effects:");
+	ImGui::Indent();
+
+	bool effectState = renderingSystem.getPostProcessingEffectState(RenderingSystem::Negative);
+	if (ImGui::Checkbox("Negative", &effectState))
+		renderingSystem.setPostProcessingEffectState(RenderingSystem::Negative, effectState);
+
+	effectState = renderingSystem.getPostProcessingEffectState(RenderingSystem::BoxBlur);
+	if (ImGui::Checkbox("Box blur", &effectState))
+		renderingSystem.setPostProcessingEffectState(RenderingSystem::BoxBlur, effectState);
+
+	ImGui::Indent();
+	if (effectState)
+	{
+		ImGui::SliderFloat("##BoxBlurLevel", &renderingSystem.getPostProcessingEffectValue(RenderingSystem::BoxBlur), 0.f, 800.f);
+	}
+	ImGui::Unindent();
+
+	effectState = renderingSystem.getPostProcessingEffectState(RenderingSystem::GaussianBlur);
+	if (ImGui::Checkbox("Gaussian blur", &effectState))
+		renderingSystem.setPostProcessingEffectState(RenderingSystem::GaussianBlur, effectState);
+
+	ImGui::Indent();
+	if (effectState)
+	{
+		ImGui::SliderFloat("##BoxBlurLevel", &renderingSystem.getPostProcessingEffectValue(RenderingSystem::GaussianBlur), 0.f, 800.f);
+	}
+	ImGui::Unindent();
+
+	effectState = renderingSystem.getPostProcessingEffectState(RenderingSystem::EdgeDetection);
+	if (ImGui::Checkbox("Edge detection", &effectState))
+		renderingSystem.setPostProcessingEffectState(RenderingSystem::EdgeDetection, effectState);
+
+	ImGui::Indent();
+	if (effectState)
+	{
+		ImGui::SliderFloat("##BoxBlurLevel", &renderingSystem.getPostProcessingEffectValue(RenderingSystem::EdgeDetection), 0.f, 800.f);
+	}
+	ImGui::Unindent();
+
+	effectState = renderingSystem.getPostProcessingEffectState(RenderingSystem::HDR);
+	if (ImGui::Checkbox("HDR", &effectState))
+		renderingSystem.setPostProcessingEffectState(RenderingSystem::HDR, effectState);
+
+	ImGui::Indent();
+	if (effectState)
+	{
+		ImGui::SliderFloat("##BoxBlurLevel", &renderingSystem.getPostProcessingEffectValue(RenderingSystem::HDR), 0.f, 10.f);
+	}
+	ImGui::Unindent();
+
+	effectState = renderingSystem.getPostProcessingEffectState(RenderingSystem::Bloom);
+	if (ImGui::Checkbox("Bloom", &effectState))
+		renderingSystem.setPostProcessingEffectState(RenderingSystem::Bloom, effectState);
+
+	ImGui::Indent();
+	if (effectState)
+	{
+		ImGui::SliderFloat("##Bloom level", &renderingSystem.getPostProcessingEffectValue(RenderingSystem::Bloom), 0.f, 10.f);
+	}
+	ImGui::Unindent();
+
+	ImGui::Unindent();
+	ImGui::EndChild();
 }
 
 void Editor::renderRendererStateOptions()
 {
+	ImGui::BeginChild("##RendererOptions", ImVec2(0.f, ImGui::GetWindowHeight() / 2.f));
 	ImGui::Text(("Frame rate: " + std::to_string((int)time.frameRate)).c_str());
 
 	bool setting = renderer->getSettingState(GraphicsAPI::Multisampling);
@@ -174,36 +247,12 @@ void Editor::renderRendererStateOptions()
 	}
 
 	ImGui::Checkbox("Base grid", &renderingSystem.helperGridEnabled);
+	ImGui::EndChild();
 }
 
 void Editor::renderEntitiesList()
 {
 	ImGui::BeginChild("##Entity list", ImVec2(0.f, ImGui::GetWindowHeight() / 2.f));
-
-	if (!demoSceneLoaded && ImGui::Button("Load demo scene", ImVec2(ImGui::GetContentRegionAvailWidth(), 0.f)))
-	{
-		Entity cube = mainScene.addEntity("Cube");
-		mainScene.addComponent<RenderingComponent>(cube);
-		RenderingComponent& cubeRenderingComp = mainScene.getComponent<RenderingComponent>(cube);
-		cubeRenderingComp.mesh.reset(GraphicsAPI::createMesh());
-		cubeRenderingComp.mesh->loadCube();
-
-		Entity light = mainScene.addEntity("Light");
-		mainScene.addComponent<RenderingComponent>(light);
-		RenderingComponent& lightRenderingComp = mainScene.getComponent<RenderingComponent>(light);
-		lightRenderingComp.mesh.reset(GraphicsAPI::createMesh());
-		lightRenderingComp.mesh->loadSphere();
-		lightRenderingComp.color = glm::vec4(1.f);
-		lightRenderingComp.lightened = false;
-
-		auto& lightTransformComp = mainScene.getComponent<TransformComponent>(light);
-		lightTransformComp.translate(glm::vec3(2.f, 2.f, 1.f));
-		lightTransformComp.scale(glm::vec3(0.2f));
-
-		mainScene.addComponent<LightComponent>(light);
-
-		demoSceneLoaded = true;
-	}
 
 	if (ImGui::CollapsingHeader("Entities list"))
 	{
@@ -239,7 +288,7 @@ void Editor::renderEntitiesList()
 			uiComponentProcessor.positiveHasComponentCheck = true;
 			processAllComponents(uiComponentProcessor);
 			uiComponentProcessor.positiveHasComponentCheck = false;
-			if (ImGui::BeginCombo("##Component list", uiComponentProcessor.getPreviewComponentName()))
+			if (ImGui::BeginCombo("##AddComponentList", uiComponentProcessor.getPreviewComponentName()))
 			{
 				processAllComponents(uiComponentProcessor);
 				ImGui::EndCombo();
@@ -271,6 +320,26 @@ void Editor::renderEntitiesList()
 		ImGui::Unindent();
 		ImGui::PopTextWrapPos();
 	}
+
+	ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 9.f);
+	ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, ImVec2(0.5f, 0.5f));
+	if (ImGui::Button("Load\nscene", ImVec2(ImGui::GetWindowWidth() / 3.f, 0.f)))
+	{
+		std::string sceneFile = sceneLoadingDialog.openFile();
+		sceneSerializer.loadScene(&mainScene, sceneFile);
+	}
+
+	ImGui::SameLine();
+	if (ImGui::Button("Save\nscene", ImVec2(ImGui::GetWindowWidth() / 3.f, 0.f)))
+	{
+		std::string saveFileName = sceneLoadingDialog.saveFile();
+		if (!saveFileName.empty())
+		{
+			sceneSerializer.serializeScene(&mainScene, saveFileName);
+		}
+	}
+	ImGui::PopStyleVar();
+
 	ImGui::EndChild();
 }
 

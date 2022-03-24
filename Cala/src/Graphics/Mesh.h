@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm/glm.hpp>
+#include <string>
 
 class Mesh {
 public:
@@ -43,10 +44,12 @@ public:
 	uint32_t getVertexCount() const { return vertexCount; }
 	uint32_t getIndexCount() const { return indexCount; }
 	uint32_t getDrawingMode() const { return drawingMode; }
+	const std::string& getMeshFile() const { return meshFile; }
 
 protected:
 	uint32_t vertexCount{ 0 };
 	uint32_t indexCount{ 0 };
 	uint32_t drawingMode;
+	std::string meshFile;
 };
 

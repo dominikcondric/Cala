@@ -3,6 +3,7 @@
 
 void Mesh::loadSphere(uint32_t stackCount, uint32_t sectorCount, float radius)
 {
+	meshFile = "Sphere";
 	const int verticesCount = (sectorCount + 1) * (stackCount + 1);
 	const int indicesCount = ((stackCount - 2) * sectorCount * 6) + (2 * sectorCount * 3);
 	const float len = 1.f / radius;
@@ -87,6 +88,7 @@ void Mesh::loadSphere(uint32_t stackCount, uint32_t sectorCount, float radius)
 
 void Mesh::loadPlane(const glm::vec3& minBound, const glm::vec3& maxBound)
 {
+	meshFile = "Plane";
 	std::vector<float> data;
 	data.reserve(8 * 4);
 	const glm::vec3 normals[4] = {
@@ -136,6 +138,7 @@ void Mesh::loadPlane(const glm::vec3& minBound, const glm::vec3& maxBound)
 
 void Mesh::loadRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const float t)
 {
+	meshFile = "Ray";
 	const glm::vec3 vertices[2] = {
 		rayOrigin,
 		rayOrigin + rayDirection * t
@@ -233,6 +236,7 @@ void Mesh::loadRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, co
 
 void Mesh::loadCube(const glm::vec3& minBound, const glm::vec3& maxBound)
 {
+	meshFile = "Cube";
 	const int indicesCount = 36;
 	const int verticesCount = 24;
 	const glm::vec3 vertices[] = {
