@@ -9,7 +9,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-bool GraphicsAPI::initialized = false;
+namespace Cala {
+	bool GraphicsAPI::initialized = false;
 
 #if CALA_API == CALA_API_OPENGL
 	void GraphicsAPI::setBufferClearingColor(const glm::vec4& color) const
@@ -206,6 +207,7 @@ bool GraphicsAPI::initialized = false;
 	{
 		glDrawElementsInstanced(drawingMode, indicesCount, GL_UNSIGNED_INT, nullptr, instancesCount);
 	}
-#else 
-	#error Api not supported yet!
-#endif
+	#else 
+		#error Api not supported yet!
+	#endif
+}

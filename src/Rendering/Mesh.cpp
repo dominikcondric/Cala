@@ -2,6 +2,7 @@
 #include <cstring>
 #include <glad/glad.h>
 
+namespace Cala {
 #if CALA_API == CALA_API_OPENGL
 	Mesh::Mesh(const Model& model, bool dynamic)
 	{
@@ -132,28 +133,29 @@
 	{
 		switch (mode)
 		{
-		case Model::DrawingMode::Triangles:
-			drawingMode = GL_TRIANGLES;
-			break;
-		case Model::DrawingMode::TriangleFan:
-			drawingMode = GL_TRIANGLE_FAN;
-			break;
-		case Model::DrawingMode::TriangleStrip:
-			drawingMode = GL_TRIANGLE_STRIP;
-			break;
-		case Model::DrawingMode::Lines:
-			drawingMode = GL_LINES;
-			break;
-		case Model::DrawingMode::LineLoop:
-			drawingMode = GL_LINE_LOOP;
-			break;
-		case Model::DrawingMode::LineStrip:
-			drawingMode = GL_LINE_STRIP;
-			break;
-		default:
-			break;
+			case Model::DrawingMode::Triangles:
+				drawingMode = GL_TRIANGLES;
+				break;
+			case Model::DrawingMode::TriangleFan:
+				drawingMode = GL_TRIANGLE_FAN;
+				break;
+			case Model::DrawingMode::TriangleStrip:
+				drawingMode = GL_TRIANGLE_STRIP;
+				break;
+			case Model::DrawingMode::Lines:
+				drawingMode = GL_LINES;
+				break;
+			case Model::DrawingMode::LineLoop:
+				drawingMode = GL_LINE_LOOP;
+				break;
+			case Model::DrawingMode::LineStrip:
+				drawingMode = GL_LINE_STRIP;
+				break;
+			default:
+				break;
 		}
 	}
 #else
 	#error Api not supported yet!
 #endif
+}

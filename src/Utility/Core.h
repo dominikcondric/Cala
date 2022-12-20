@@ -15,5 +15,7 @@
 	#define CALA_PLATFORM_APPLE
 #endif
 
-template<typename T> using Unique = std::unique_ptr<T>;
-template<typename T> using Shared = std::shared_ptr<T>;
+namespace Cala {
+	template<typename T> using Unique = std::unique_ptr<T>;
+	template<typename T> using Shared = std::shared_ptr<T>;
+}

@@ -8,8 +8,7 @@
 #include <glad/glad.h>
 #include "Utility/Core.h"
 
-#define BIT(x) (1 << x)
-
+namespace Cala {
 #if CALA_API == CALA_API_OPENGL
 	Shader::Shader(Shader&& other) noexcept
 	{
@@ -183,3 +182,4 @@
 #else
 	#error API is not supported!
 #endif
+}

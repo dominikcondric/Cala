@@ -5,193 +5,195 @@
 #define SPACE_MOVE (moveSensitivity * deltaTime)
 #define FULL_CIRCLE (2 * glm::pi<float>())
 
-Camera::Camera()
-{
-	recalculateEulerAngles();
-}
-
-void Camera::recalculateEulerAngles()
-{
-	wDirection = glm::normalize(center - position);
-	center = position + wDirection;
-	uDirection = glm::cross(wDirection, lookUp);
-	vDirection = glm::cross(uDirection, wDirection);
-
-	pitch = glm::asin(glm::dot(glm::vec3(0.f, 1.f, 0.f), wDirection));
-	yaw = glm::atan(glm::dot(glm::vec3(0.f, 0.f, -1.f), wDirection) / glm::dot(glm::vec3(1.f, 0.f, 0.f), wDirection));
-
-	if (wDirection.z < 0.f)
+namespace Cala {
+	Camera::Camera()
 	{
-		yaw = FULL_CIRCLE - yaw;
+		recalculateEulerAngles();
 	}
 
-	view = glm::lookAt(position, center, lookUp);
-	viewChanged = true;
-}
-
-void Camera::setPosition(const glm::vec3& newPosition)
-{
-	position = newPosition;
-	center = position + wDirection;
-	view = glm::lookAt(position, center, lookUp);
-	viewChanged = true;
-}
-
-void Camera::setCenter(const glm::vec3& newCenter)
-{
-	center = newCenter;
-	recalculateEulerAngles();
-}
-
-void Camera::setUp(const glm::vec3& up)
-{
-	lookUp = up;
-	recalculateEulerAngles();
-}
-
-void Camera::setProjectionNearPlane(float near)
-{
-	nearPlane = near;
-	project();
-}
-
-void Camera::setProjectionFarPlane(float far)
-{
-	farPlane = far;
-	project();
-}
-
-void Camera::rotateCamera(const glm::vec2& offset)
-{
-	float mouseOffsetX = offset.x;
-	float mouseOffsetY = offset.y;
-
-	yaw += mouseOffsetX * mouseSensitivity;
-	if (yaw < 0.f)
-		yaw += FULL_CIRCLE;
-	else if (yaw > FULL_CIRCLE)
-		yaw -= FULL_CIRCLE;
-
-	if (pitch + (mouseOffsetY * mouseSensitivity) < glm::pi<float>() / 2 && pitch + (mouseOffsetY * mouseSensitivity) > -glm::pi<float>() / 2)
-		pitch += mouseOffsetY * mouseSensitivity;
-
-	wDirection.x = glm::cos(yaw) * glm::cos(pitch);
-	wDirection.y = glm::sin(pitch);
-	wDirection.z = glm::sin(yaw) * glm::cos(pitch);
-	wDirection = glm::normalize(wDirection);
-	center = position + wDirection;
-	uDirection = glm::cross(wDirection, lookUp);
-	vDirection = glm::cross(uDirection, wDirection);
-
-	view = glm::lookAt(position, center, lookUp);
-	viewChanged = true;
-}
-
-void Camera::setMouseSensitivity(float sensitivity)
-{
-	mouseSensitivity = sensitivity;
-	recalculateEulerAngles();
-}
-
-void Camera::setMoveSensitivity(float sensitivity)
-{
-	moveSensitivity = sensitivity;
-	recalculateEulerAngles();
-}
-
-void Camera::moveCamera(Directions direction, float deltaTime)
-{
-	switch (direction)
+	void Camera::recalculateEulerAngles()
 	{
-	case Directions::FORWARD:
-		position += wDirection * SPACE_MOVE;
-		center += wDirection * SPACE_MOVE;
-		break;
+		wDirection = glm::normalize(center - position);
+		center = position + wDirection;
+		uDirection = glm::cross(wDirection, lookUp);
+		vDirection = glm::cross(uDirection, wDirection);
 
-	case Directions::BACKWARD:
-		position -= wDirection * SPACE_MOVE;
-		center -= wDirection * SPACE_MOVE;
-		break;
+		pitch = glm::asin(glm::dot(glm::vec3(0.f, 1.f, 0.f), wDirection));
+		yaw = glm::atan(glm::dot(glm::vec3(0.f, 0.f, -1.f), wDirection) / glm::dot(glm::vec3(1.f, 0.f, 0.f), wDirection));
 
-	case Directions::LEFT:
-		position -= uDirection * SPACE_MOVE;
-		center -= uDirection * SPACE_MOVE;
-		break;
+		if (wDirection.z < 0.f)
+		{
+			yaw = FULL_CIRCLE - yaw;
+		}
 
-	case Directions::RIGHT:
-		position += uDirection * SPACE_MOVE;
-		center += uDirection * SPACE_MOVE;
-		break;
-
-	case Directions::UP:
-		position += lookUp * SPACE_MOVE;
-		center += lookUp * SPACE_MOVE;
-		break;
-
-	case Directions::DOWN:
-		position -= lookUp * SPACE_MOVE;
-		center -= lookUp * SPACE_MOVE;
-		break;
+		view = glm::lookAt(position, center, lookUp);
+		viewChanged = true;
 	}
 
-	view = glm::lookAt(position, center, lookUp);
-	viewChanged = true;
-}
+	void Camera::setPosition(const glm::vec3& newPosition)
+	{
+		position = newPosition;
+		center = position + wDirection;
+		view = glm::lookAt(position, center, lookUp);
+		viewChanged = true;
+	}
 
-PerspectiveCamera::PerspectiveCamera()
-{
-	project();
-}
+	void Camera::setCenter(const glm::vec3& newCenter)
+	{
+		center = newCenter;
+		recalculateEulerAngles();
+	}
 
-void PerspectiveCamera::setProjectionViewingAngle(float angle)
-{
-	viewingAngle = angle;
-	project();
-}
+	void Camera::setUp(const glm::vec3& up)
+	{
+		lookUp = up;
+		recalculateEulerAngles();
+	}
 
-void PerspectiveCamera::setProjectionAspectRatio(float ratio)
-{
-	aspectRatio = ratio;
-	project();
-}
+	void Camera::setProjectionNearPlane(float near)
+	{
+		nearPlane = near;
+		project();
+	}
 
-void PerspectiveCamera::project()
-{
-	projection = glm::perspective(glm::radians(viewingAngle), aspectRatio, nearPlane, farPlane);
-	projectionChanged = true;
-}
+	void Camera::setProjectionFarPlane(float far)
+	{
+		farPlane = far;
+		project();
+	}
 
-OrthograficCamera::OrthograficCamera()
-{
-	project();
-}
+	void Camera::rotateCamera(const glm::vec2& offset)
+	{
+		float mouseOffsetX = offset.x;
+		float mouseOffsetY = offset.y;
 
-void OrthograficCamera::setProjectionLeftPlane(float left)
-{
-	leftPlane = left;
-	project();
-}
+		yaw += mouseOffsetX * mouseSensitivity;
+		if (yaw < 0.f)
+			yaw += FULL_CIRCLE;
+		else if (yaw > FULL_CIRCLE)
+			yaw -= FULL_CIRCLE;
 
-void OrthograficCamera::setProjectionRightPlane(float right)
-{
-	rightPlane = right;
-	project();
-}
+		if (pitch + (mouseOffsetY * mouseSensitivity) < glm::pi<float>() / 2 && pitch + (mouseOffsetY * mouseSensitivity) > -glm::pi<float>() / 2)
+			pitch += mouseOffsetY * mouseSensitivity;
 
-void OrthograficCamera::setProjectionTopPlane(float top)
-{
-	topPlane = top;
-	project();
-}
+		wDirection.x = glm::cos(yaw) * glm::cos(pitch);
+		wDirection.y = glm::sin(pitch);
+		wDirection.z = glm::sin(yaw) * glm::cos(pitch);
+		wDirection = glm::normalize(wDirection);
+		center = position + wDirection;
+		uDirection = glm::cross(wDirection, lookUp);
+		vDirection = glm::cross(uDirection, wDirection);
 
-void OrthograficCamera::setProjectionBottomPlane(float bottom)
-{
-	bottomPlane = bottom;
-	project();
-}
+		view = glm::lookAt(position, center, lookUp);
+		viewChanged = true;
+	}
 
-void OrthograficCamera::project()
-{
-	projection = glm::ortho(leftPlane, rightPlane, nearPlane, farPlane);
-	projectionChanged = true;
+	void Camera::setMouseSensitivity(float sensitivity)
+	{
+		mouseSensitivity = sensitivity;
+		recalculateEulerAngles();
+	}
+
+	void Camera::setMoveSensitivity(float sensitivity)
+	{
+		moveSensitivity = sensitivity;
+		recalculateEulerAngles();
+	}
+
+	void Camera::moveCamera(Directions direction, float deltaTime)
+	{
+		switch (direction)
+		{
+			case Directions::FORWARD:
+				position += wDirection * SPACE_MOVE;
+				center += wDirection * SPACE_MOVE;
+				break;
+
+			case Directions::BACKWARD:
+				position -= wDirection * SPACE_MOVE;
+				center -= wDirection * SPACE_MOVE;
+				break;
+
+			case Directions::LEFT:
+				position -= uDirection * SPACE_MOVE;
+				center -= uDirection * SPACE_MOVE;
+				break;
+
+			case Directions::RIGHT:
+				position += uDirection * SPACE_MOVE;
+				center += uDirection * SPACE_MOVE;
+				break;
+
+			case Directions::UP:
+				position += lookUp * SPACE_MOVE;
+				center += lookUp * SPACE_MOVE;
+				break;
+
+			case Directions::DOWN:
+				position -= lookUp * SPACE_MOVE;
+				center -= lookUp * SPACE_MOVE;
+				break;
+		}
+
+		view = glm::lookAt(position, center, lookUp);
+		viewChanged = true;
+	}
+
+	PerspectiveCamera::PerspectiveCamera()
+	{
+		project();
+	}
+
+	void PerspectiveCamera::setProjectionViewingAngle(float angle)
+	{
+		viewingAngle = angle;
+		project();
+	}
+
+	void PerspectiveCamera::setProjectionAspectRatio(float ratio)
+	{
+		aspectRatio = ratio;
+		project();
+	}
+
+	void PerspectiveCamera::project()
+	{
+		projection = glm::perspective(glm::radians(viewingAngle), aspectRatio, nearPlane, farPlane);
+		projectionChanged = true;
+	}
+
+	OrthograficCamera::OrthograficCamera()
+	{
+		project();
+	}
+
+	void OrthograficCamera::setProjectionLeftPlane(float left)
+	{
+		leftPlane = left;
+		project();
+	}
+
+	void OrthograficCamera::setProjectionRightPlane(float right)
+	{
+		rightPlane = right;
+		project();
+	}
+
+	void OrthograficCamera::setProjectionTopPlane(float top)
+	{
+		topPlane = top;
+		project();
+	}
+
+	void OrthograficCamera::setProjectionBottomPlane(float bottom)
+	{
+		bottomPlane = bottom;
+		project();
+	}
+
+	void OrthograficCamera::project()
+	{
+		projection = glm::ortho(leftPlane, rightPlane, nearPlane, farPlane);
+		projectionChanged = true;
+	}
 }

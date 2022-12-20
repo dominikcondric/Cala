@@ -4,7 +4,7 @@
 #include <glad/glad.h>
 #include "Utility/Core.h"
 
-
+namespace Cala {
 #if CALA_API == CALA_API_OPENGL
 	std::unordered_map<uint32_t, GLuint> ConstantBuffer::bindingPointsCache;
 	ConstantBuffer::~ConstantBuffer()
@@ -73,3 +73,4 @@
 #else
 	#error API is not supported
 #endif
+}

@@ -6,4 +6,4 @@ find_package(OpenGL 4.3 REQUIRED)
 set(dependencies_dir ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies)
 
 add_subdirectory(Dependencies)
-add_subdirectory(src)
+add_subdirectory(src Cala)

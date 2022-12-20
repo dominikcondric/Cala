@@ -2,6 +2,7 @@
 #include <cstring>
 #include <glad/glad.h>
 
+namespace Cala {
 #if CALA_API == CALA_API_OPENGL
     Texture::Texture(const Image& image, const Specification& specification)
     {
@@ -50,20 +51,20 @@
     {
         switch (method)
         {
-        case Texture::WrappingMethod::ClampToEdge:
-            return GL_CLAMP_TO_EDGE;
-            break;
-        case Texture::WrappingMethod::ClampToBorder:
-            return GL_CLAMP_TO_BORDER;
-            break;
-        case Texture::WrappingMethod::Repeat:
-            return GL_REPEAT;
-            break;
-        case Texture::WrappingMethod::MirroredRepeat:
-            return GL_MIRRORED_REPEAT;
-            break;
-        default:
-            return GL_CLAMP_TO_EDGE;
+            case Texture::WrappingMethod::ClampToEdge:
+                return GL_CLAMP_TO_EDGE;
+                break;
+            case Texture::WrappingMethod::ClampToBorder:
+                return GL_CLAMP_TO_BORDER;
+                break;
+            case Texture::WrappingMethod::Repeat:
+                return GL_REPEAT;
+                break;
+            case Texture::WrappingMethod::MirroredRepeat:
+                return GL_MIRRORED_REPEAT;
+                break;
+            default:
+                return GL_CLAMP_TO_EDGE;
         }
     }
 
@@ -124,7 +125,7 @@
                 {
                     texInternalFormat = GL_SRGB_ALPHA;
                     texFormat = GL_RGBA;
-                } 
+                }
                 else
                 {
                     texFormat = texInternalFormat = GL_RGBA;
@@ -187,3 +188,4 @@
 #else
     #error Api not supported yet!
 #endif
+}

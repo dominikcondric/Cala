@@ -48,6 +48,11 @@ target_compile_definitions(Cala PUBLIC SHADERS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/
 
 target_compile_features(Cala PUBLIC cxx_std_17)
 
+set_target_properties(Cala
+    PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/lib
+)
+
 target_link_libraries(Cala
     PRIVATE
         glad

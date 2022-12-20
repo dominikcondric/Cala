@@ -5,6 +5,7 @@
 
 #define MAX_COLOR_ATTACHMENTS 32
 
+namespace Cala {
 #if CALA_API == CALA_API_OPENGL
 	Framebuffer::~Framebuffer()
 	{
@@ -168,3 +169,4 @@
 #else
 	#error API not supported!
 #endif
+}
