@@ -1,5 +1,7 @@
 #include "Model.h"
 #include <glm/gtc/constants.hpp>
+#include <unordered_map>
+#include <glm/gtx/string_cast.hpp>
 
 namespace Cala {
 	Model& Model::loadSphere(uint32_t stackCount, uint32_t sectorCount, float radius)
@@ -155,7 +157,7 @@ namespace Cala {
 	}
 
 	Model& Model::loadCustomModel(const std::vector<float>& _vertexData, uint32_t _vertexCount,
-		const std::vector<uint32_t>& _indexData, std::vector<VertexLayoutSpecification>& _layoutSpecification, DrawingMode _drawingMode)
+		const std::vector<uint32_t>& _indexData, const std::vector<VertexLayoutSpecification>& _layoutSpecification, DrawingMode _drawingMode)
 	{
 		path = "custom";
 		vertexData = _vertexData;
@@ -358,5 +360,47 @@ namespace Cala {
 		layoutSpecification.push_back({ 2, 2, 8 * sizeof(float), 2 * sizeof(glm::vec3), 1 });
 
 		return *this;
+	}
+
+	void Model::removeReduntantVertices()
+	{
+		/*
+		* Algorithm for removing redundant vertices
+		* Iterate over every vertex and add every vertex to new array only once
+		* Create a map that maps every previous vertex index to new vertex index
+		* Recreate index list using previous-to-new index mapping
+		*/
+
+		std::vector<float> newVertices;
+		std::vector<uint32_t> newIndices(indexCount);
+		std::vector<uint32_t> oldToNewIndexMapping(vertexCount);
+		std::unordered_map<std::string, uint32_t> vertexMap;
+
+		for (int i = 0; i < vertexCount; i++)
+		{
+			glm::vec3 vertex(vertexData[i * 8], vertexData[i * 8 + 1], vertexData[i * 8 + 2]);
+			auto mapIterator = vertexMap.find(glm::to_string(vertex));
+			if (mapIterator == vertexMap.end())
+			{
+				oldToNewIndexMapping[i] = vertexMap.size();							    // Map old vertex to new vertex index
+				vertexMap.insert({ glm::to_string(vertex), vertexMap.size() });			// Add unique vertex
+				for (int j = 0; j < 8; ++j)
+					newVertices.push_back(vertexData[i * 8 + j]);						// Add vertex to new vertex array
+			}
+			else
+			{
+				oldToNewIndexMapping[i] = mapIterator->second;
+			}
+		}
+
+		for (int i = 0; i < indexCount; ++i)
+		{
+			uint32_t oldIndex = indexData[i];
+			newIndices[i] = oldToNewIndexMapping[oldIndex];
+		}
+
+		vertexData = newVertices;
+		vertexCount = newVertices.size() / 8;
+		indexData = newIndices;
 	}
 }

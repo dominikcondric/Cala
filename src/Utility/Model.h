@@ -33,12 +33,13 @@ namespace Cala {
 		uint32_t getVertexCount() const { return vertexCount; }
 		uint32_t getIndexCount() const { return indexCount; }
 		const std::string& getModelPath() const { return path; }
+		void removeReduntantVertices();
 
 		Model& loadSphere(uint32_t stackCount = 30, uint32_t sectorCount = 50, float radius = 0.5f);
 		Model& loadCube(const glm::vec3& minBound = glm::vec3(-0.5f), const glm::vec3& maxBound = glm::vec3(0.5f));
 		Model& loadPlane(const glm::vec3& minBound = glm::vec3(-0.5f, 0.f, -0.5f), const glm::vec3& maxBound = glm::vec3(0.5f, 0.f, 0.5f));
 		Model& loadRay(const glm::vec3& rayOrigin = glm::vec3(0.f), const glm::vec3& rayDirection = glm::vec3(0.f, 0.f, 1.f), const float t = 10.f);
-		Model& loadCustomModel(const std::vector<float>& vertexData, uint32_t vertexCount, const std::vector<uint32_t>& indexData, std::vector<VertexLayoutSpecification>& _layoutSpecification, DrawingMode _drawingMode);
+		Model& loadCustomModel(const std::vector<float>& vertexData, uint32_t vertexCount, const std::vector<uint32_t>& indexData, const std::vector<VertexLayoutSpecification>& _layoutSpecification, DrawingMode _drawingMode);
 
 	private:
 		std::vector<float> vertexData;
