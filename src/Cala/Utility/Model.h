@@ -49,5 +49,9 @@ namespace Cala {
 		uint32_t indexCount = 0;
 		uint32_t vertexCount = 0;
 		std::string path;
+
+		// Must be called after index data is defined
+		std::vector<glm::vec3> calculateTangents(const std::vector<glm::vec3>& vertices, 
+			const std::vector<glm::vec2>& textureCoordinates, const std::vector<uint32_t>& indices) const;
 	};
 }

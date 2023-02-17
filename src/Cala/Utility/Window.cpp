@@ -59,6 +59,7 @@ namespace Cala {
 		resized = false;
 		ioSystem->update();
 		glfwSwapBuffers(windowHandle);
+		time.update();
 	}
 
 	bool Window::exitTriggered() const
@@ -78,7 +79,7 @@ namespace Cala {
 	#if defined GLFW_EXPOSE_NATIVE_WIN32
 		return glfwGetWin32Window(windowHandle);
 	#elif defined GLFW_EXPOSE_NATIVE_X11
-		return glfwGetX11Window(windowHandle);
+		return (void*)glfwGetX11Window(windowHandle);
 	#elif defined GLFW_EXPOSE_NATIVE_COCOA
 		return glfwGetCocoaWindow(windowHandle);
 	#endif
