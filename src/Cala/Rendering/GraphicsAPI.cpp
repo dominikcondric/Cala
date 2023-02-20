@@ -13,6 +13,22 @@ namespace Cala {
 	bool GraphicsAPI::initialized = false;
 
 #if CALA_API == CALA_API_OPENGL
+	GraphicsAPI* GraphicsAPI::construct()
+	{
+		if (!initialized)
+		{
+			initialized = true;
+			return new GraphicsAPI();
+		}
+
+		return nullptr;
+	}
+
+	GraphicsAPI::~GraphicsAPI()
+	{
+		initialized = false;
+	}
+
 	void GraphicsAPI::setBufferClearingColor(const glm::vec4& color) const
 	{
 		glClearColor(color.x, color.y, color.z, color.w);
@@ -119,17 +135,6 @@ namespace Cala {
 		glClear(bufferClearingBitmask);
 	}
 
-	GraphicsAPI* GraphicsAPI::construct()
-	{
-		if (!initialized)
-		{
-			initialized = true;
-			return new GraphicsAPI();
-		}
-
-		return nullptr;
-	}
-
 	void GraphicsAPI::render(const Mesh& mesh) const
 	{
 		mesh.setForRendering();
@@ -146,11 +151,6 @@ namespace Cala {
 			drawInstanced(mesh.getDrawingMode(), mesh.getVertexCount(), drawCount);
 		else
 			drawIndexedInstanced(mesh.getDrawingMode(), mesh.getIndexCount(), drawCount);
-	}
-
-	GraphicsAPI::~GraphicsAPI()
-	{
-		initialized = false;
 	}
 
 	uint32_t GraphicsAPI::mapConstant(Constant constant) const

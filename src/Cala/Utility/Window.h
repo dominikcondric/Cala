@@ -13,20 +13,18 @@ struct GLFWwindow;
 namespace Cala {
 	class Window {
 	public:
-		struct WindowSpecification {
+		struct Specification {
+			Specification(const std::string& _windowName, uint32_t _width, uint32_t _height, uint32_t _sampleCount) :
+				windowName(_windowName), width(_width), height(_height), sampleCount(_sampleCount) {}
 			std::string windowName;
-			int width;
-			int height;
+			uint32_t width;
+			uint32_t height;
 			uint32_t sampleCount;
 		};
 
 	public:
-		Window(const WindowSpecification& specification);
+		static Window* construct(const Specification& specification);
 		~Window();
-		void shutdown();
-		void createOpenGLContext() const;
-		//void createDirectXContext() const;
-		//void createVulkanContext() const;
 		void update();
 		bool exitTriggered() const;
 		bool isResized() const { return resized; }
@@ -37,11 +35,15 @@ namespace Cala {
 		void* const getNativeWindowPointer() const;
 
 	private:
+		Window(const Specification& specification);
+		static void windowResizeCallback(GLFWwindow* window, int w, int h);
+		void createContext() const;
+
 		Time time;
 		Unique<IOSystem> ioSystem;
 		GLFWwindow* windowHandle = nullptr;
 		std::string windowName;
 		bool resized = false;
-		static void windowResizeCallback(GLFWwindow* window, int w, int h);
+		static bool initialized;
 	};
 }

@@ -15,7 +15,9 @@
 #include <GLFW/glfw3native.h>
 
 namespace Cala {
-	Window::Window(const WindowSpecification& specification)
+	bool Window::initialized = false;
+
+	Window::Window(const Specification& specification)
 	{
 		if (!glfwInit())
 			LOG_ERROR("Failed to initialize GLFW!");
@@ -25,33 +27,48 @@ namespace Cala {
 		windowHandle = glfwCreateWindow(specification.width, specification.height, windowName.c_str(), NULL, NULL);
 		if (!windowHandle)
 		{
-			shutdown();
+			glfwTerminate();
 			LOG_ERROR("Failed to create window!");
+			return;
 		}
 
 		glfwSetWindowSizeCallback(windowHandle, windowResizeCallback);
 		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		glfwSetWindowUserPointer(windowHandle, this);
 		ioSystem = std::make_unique<IOSystem>(windowHandle);
+
+		createContext();
+	}
+
+	Window* Window::construct(const Specification& specification)
+	{
+		if (!initialized)
+		{
+			initialized = true;
+			return new Window(specification);
+		}
+
+		return nullptr;
 	}
 
 	Window::~Window()
 	{
-		shutdown();
-	}
-
-	void Window::shutdown()
-	{
+		glfwMakeContextCurrent(NULL);
 		glfwTerminate();
 	}
 
-	void Window::createOpenGLContext() const
+
+	void Window::createContext() const
 	{
+	#if CALA_API == CALA_API_OPENGL
 		glfwMakeContextCurrent(windowHandle);
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 			LOG_ERROR("Failed to initialize GLAD");
 		}
+	#else
+		#error Api not supported yet!
+	#endif
 	}
 
 	void Window::update()
