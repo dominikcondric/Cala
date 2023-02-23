@@ -12,6 +12,11 @@ namespace Cala {
 		api->setViewport(glm::ivec4(0, 0, windowSpecification.width, windowSpecification.height));
 	}
 
+	BaseApplication::~BaseApplication()
+	{
+	}
+
+
 	void BaseApplication::update()
 	{
 		const IOSystem& ioSystem = window->getIO();

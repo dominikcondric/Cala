@@ -41,9 +41,7 @@ namespace Cala {
 		api->enableSetting(GraphicsAPI::FaceCulling);
 		api->enableSetting(GraphicsAPI::DepthTesting);
 		int lightened = 1;
-		int shadows = 0;
 		materialsBuffer.updateData("lightened", &lightened, sizeof(int));
-		materialsBuffer.updateData("shadows", &shadows, sizeof(int));
 
 		for (uint32_t state = 0; state < 8; ++state)
 		{

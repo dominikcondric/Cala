@@ -3,7 +3,6 @@
 #define DIFFUSE 0 
 #define SPECULAR 1
 #define NORMAL 2
-#define SKYBOX 3
 
 #define BIT(x) (1 << x)
 
@@ -40,8 +39,6 @@ layout (binding = 2) uniform MeshData
 {
 	Material material;
 	uint lightSourceCount;
-	bool shadows;
-	float indexRatio;
 	uint state;
 	bool lightened; 
 };
@@ -57,22 +54,9 @@ layout (binding = 0) uniform MVP
 layout (binding = 0) uniform sampler2D diffuseMap;
 layout (binding = 1) uniform sampler2D specularMap;
 layout (binding = 2) uniform sampler2D normalMap;
-layout (binding = 3) uniform samplerCube cubeMap; 
 
 out vec4 outColor;
 vec3 normal;
-
-vec3 reflectionVector() 
-{
-	vec3 vector = reflect(normalize(inAttributes.fragPosition - eyePosition), normal);
-	return vector;
-}
-
-vec3 refractionVector() 
-{
-	vec3 vector = refract(normalize(inAttributes.fragPosition - eyePosition), normal, indexRatio);
-	return vector;
-}
 
 float attenuation(in Light light) 
 {
@@ -98,7 +82,6 @@ vec3 calculatePointLight(in vec3 colorAmbient, in vec3 colorDiffuse, in vec3 col
 	float eyeAngle = pow(max(dot(halfwayVector, normal), 0.0), material.shininess);
 	vec3 specularComponent = colorSpecular * light.color * eyeAngle;
 		
-	// float shadow = shadowCalculation(1.0 - dot(normal, lightDirection));
 	vec3 result = ambientComponent + ((diffuseComponent + specularComponent) * attenuation(light));
 
 	return result;
@@ -200,22 +183,6 @@ void main()
 	else
 	{
 		normal = inAttributes.TBN[2];
-	}
-
-		
-	if ((state & BIT(SKYBOX)) != 0)
-	{
-		vec3 mappingVector = vec3(0.0);
-		if (indexRatio == 0.0f)
-			mappingVector = reflectionVector();
-		else 
-			mappingVector = refractionVector();
-
-		vec4 skyboxSample = texture(cubeMap, mappingVector);
-		colorAmbient = skyboxSample.rgb * (material.ambientCoefficient + material.color.rgb);
-		colorDiffuse = skyboxSample.rgb * material.diffuseCoefficient * material.color.rgb;
-		colorSpecular = skyboxSample.rgb * material.specularCoefficient * material.color.rgb;
-		alpha = material.color.a;
 	}
 
 	vec4 color = vec4(0.f, 0.f, 0.f, 1.f);

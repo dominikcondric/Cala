@@ -13,7 +13,7 @@ namespace Cala {
 	class BaseApplication {
 	public:
 		BaseApplication(const Window::Specification& windowSpecification);
-		virtual ~BaseApplication() = 0 {}
+		virtual ~BaseApplication() = 0;
 		void run();
 
 	protected:
