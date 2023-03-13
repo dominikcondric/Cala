@@ -29,7 +29,6 @@ namespace Cala {
 		bool exitTriggered() const;
 		bool isResized() const { return resized; }
 		const IOSystem& getIO() const { return *ioSystem.get(); }
-		const Time& getTime() const { return time; }
 		glm::ivec2 getWindowSize() const;
 		GLFWwindow* const getWindowPointer() const { return windowHandle; }
 		void* const getNativeWindowPointer() const;
@@ -39,7 +38,6 @@ namespace Cala {
 		static void windowResizeCallback(GLFWwindow* window, int w, int h);
 		void createContext() const;
 
-		Time time;
 		Unique<IOSystem> ioSystem;
 		GLFWwindow* windowHandle = nullptr;
 		std::string windowName;

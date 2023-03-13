@@ -76,7 +76,6 @@ namespace Cala {
 		resized = false;
 		ioSystem->update();
 		glfwSwapBuffers(windowHandle);
-		time.update();
 	}
 
 	bool Window::exitTriggered() const

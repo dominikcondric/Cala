@@ -6,8 +6,7 @@
 #include <Rendering/Renderers/SimpleRenderer.h>
 #include "Utility/Window.h"
 #include <glm/gtc/random.hpp>
-
-#define MOVE_SPEED 5.f * deltaTime
+#include "Time.h"
 
 namespace Cala {
 	class BaseApplication {
@@ -20,9 +19,14 @@ namespace Cala {
 		Unique<Window> window;
 		Unique<GraphicsAPI> api;
 		PerspectiveCamera camera;
+		Time time;
+
+		void setFpsLock(float fps);
+		bool moveCamera = true;
 
 	private:
 		virtual void loop() = 0;
 		void update();
+		float fpsLock = 60.f;
 	};
 }

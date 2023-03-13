@@ -1,10 +1,10 @@
 #include "DemoApplication.h"
 
-#define LIGHT_MOVE 10.f * deltaTime
+#define LIGHT_MOVE 10.f * time.deltaTime
 
 DemoApplication::DemoApplication() : BaseApplication(Window::Specification("Demo", 1920, 1080, 4)),
 light(LightRenderer::Light::Type::Point, Transformation().translate(glm::vec3(1.f, 5.f, 0.f)), 1.f, glm::vec3(1.f), 0.f),
-sphereMesh(Model().loadSphere()),
+sphereMesh(Model().loadCube()),
 lightRenderable(sphereMesh, light.transformation.scale(0.2f), glm::vec4(1.f))
 {
 	std::filesystem::path texturesDirectory = std::filesystem::path(__FILE__).parent_path() / "textures";
@@ -39,7 +39,6 @@ void DemoApplication::loop()
 	simpleRenderer.render(api.get(), camera);
 
 	const IOSystem& io = window->getIO();
-	const float deltaTime = window->getTime().deltaTime;
 
 	if (io.isKeyPressed(IOSystem::KEY_UP))
 	{

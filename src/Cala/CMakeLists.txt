@@ -21,7 +21,7 @@ set(src_files
     Utility/IOSystem.h              Utility/IOSystem.cpp
     Utility/Transformation.h        Utility/Transformation.cpp
     Utility/BaseApplication.h        Utility/BaseApplication.cpp
-    Utility/Core.h
+    Utility/Core.h                    Utility/Core.cpp
 
     Rendering/Shaders/HelperGridFragmentShader.glsl
     Rendering/Shaders/HelperGridGeometryShader.glsl
