@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Utility/Model.h>
-#include <Rendering/Texture.h>
-#include <Rendering/Renderers/LightRenderer.h>
-#include <Rendering/Renderers/SimpleRenderer.h>
-#include "Utility/Window.h"
+#include <Cala/Utility/Model.h>
+#include <Cala/Rendering/Texture.h>
+#include <Cala/Rendering/Renderers/LightRenderer.h>
+#include <Cala/Rendering/Renderers/SimpleRenderer.h>
+#include "Cala/Utility/Window.h"
 #include <glm/gtc/random.hpp>
 #include "Time.h"
 

@@ -1,7 +1,7 @@
 #pragma once 
-#include "../GraphicsAPI.h"
-#include "../Shader.h"
-#include "../Camera.h"
+#include "Cala/Rendering/GraphicsAPI.h"
+#include "Cala/Rendering/Shader.h"
+#include "Cala/Rendering/Camera.h"
 
 namespace Cala {
 	class IRenderer {

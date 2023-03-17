@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "Utility/Image.h"
+#include "Cala/Utility/Image.h"
 #include <array>
 
 typedef uint32_t GLuint;

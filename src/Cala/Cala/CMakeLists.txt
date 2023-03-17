@@ -39,14 +39,6 @@ add_library(Cala STATIC
     ${src_files}
 )
 
-if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.8.)
-    source_group (TREE
-        ${CMAKE_CURRENT_SOURCE_DIR} 
-        FILES 
-            ${src_files}
-    )
-endif()
-
 target_compile_definitions(Cala PUBLIC SHADERS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Rendering/Shaders/")
 
 target_compile_features(Cala PUBLIC cxx_std_17)
@@ -67,6 +59,6 @@ target_include_directories(Cala
     PRIVATE
         ${dependencies_dir}/ImageLoader/
     PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../
         ${dependencies_dir}/glm/
 )

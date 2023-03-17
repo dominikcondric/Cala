@@ -2,7 +2,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <string>
-#include "Utility/Model.h"
+#include "Cala/Utility/Model.h"
 
 typedef uint32_t GLuint;
 

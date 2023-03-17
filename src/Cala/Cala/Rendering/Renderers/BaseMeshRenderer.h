@@ -1,10 +1,10 @@
 #pragma once 
-#include "../GraphicsAPI.h"
-#include "../Mesh.h"
-#include "../Texture.h"
-#include "../Shader.h"
-#include "../ConstantBuffer.h"
-#include "../Camera.h"
+#include "Cala/Rendering/GraphicsAPI.h"
+#include "Cala/Rendering/Mesh.h"
+#include "Cala/Rendering/Texture.h"
+#include "Cala/Rendering/Shader.h"
+#include "Cala/Rendering/ConstantBuffer.h"
+#include "Cala/Rendering/Camera.h"
 
 class Renderer {
 public:

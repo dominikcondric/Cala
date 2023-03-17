@@ -1,8 +1,8 @@
 #pragma once
-#include "Rendering/Framebuffer.h"
-#include "Rendering/GraphicsAPI.h"
-#include "Rendering/Shader.h"
-#include "Rendering/ConstantBuffer.h"
+#include "Cala/Rendering/Framebuffer.h"
+#include "Cala/Rendering/GraphicsAPI.h"
+#include "Cala/Rendering/Shader.h"
+#include "Cala/Rendering/ConstantBuffer.h"
 
 namespace Cala {
 	class PostProcessor {

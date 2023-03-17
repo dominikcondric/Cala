@@ -1,6 +1,6 @@
 #pragma once 
 #include "IRenderer.h"
-#include "Rendering/Texture.h"
+#include "Cala/Rendering/Texture.h"
 
 namespace Cala {
 	class SkyboxRenderer : public IRenderer {

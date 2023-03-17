@@ -2,7 +2,7 @@
 #include <glad/glad.h>
 #include <cstring>
 #include <glad/glad.h>
-#include "Utility/Core.h"
+#include "Cala/Utility/Core.h"
 
 namespace Cala {
 #if CALA_API == CALA_API_OPENGL

@@ -1,7 +1,7 @@
 #pragma once 
 #include "IRenderer.h"
-#include "Rendering/Texture.h"
-#include "Utility/Transformation.h"
+#include "Cala/Rendering/Texture.h"
+#include "Cala/Utility/Transformation.h"
 #include <stack>
 
 namespace Cala {

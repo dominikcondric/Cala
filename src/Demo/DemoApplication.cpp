@@ -4,7 +4,7 @@
 
 DemoApplication::DemoApplication() : BaseApplication(Window::Specification("Demo", 1920, 1080, 4)),
 light(LightRenderer::Light::Type::Point, Transformation().translate(glm::vec3(1.f, 5.f, 0.f)), 1.f, glm::vec3(1.f), 0.f),
-sphereMesh(Model().loadCube()),
+sphereMesh(Model().loadSphere()),
 lightRenderable(sphereMesh, light.transformation.scale(0.2f), glm::vec4(1.f))
 {
 	std::filesystem::path texturesDirectory = std::filesystem::path(__FILE__).parent_path() / "textures";

@@ -1,11 +1,11 @@
 #pragma once 
-#include "../GraphicsAPI.h"
-#include "../Mesh.h"
-#include "../Shader.h"
-#include "../ConstantBuffer.h"
-#include "../Camera.h"
+#include "Cala/Rendering/GraphicsAPI.h"
+#include "Cala/Rendering/Mesh.h"
+#include "Cala/Rendering/Shader.h"
+#include "Cala/Rendering/ConstantBuffer.h"
+#include "Cala/Rendering/Camera.h"
 #include "IRenderer.h"
-#include "Utility/Transformation.h"
+#include "Cala/Utility/Transformation.h"
 
 namespace Cala {
 	class HelperGridRenderer : public IRenderer {
