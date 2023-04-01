@@ -20,12 +20,16 @@ namespace Cala {
 
 		/**
 		 * Adds color target to a framebuffer
-		 * If layer == 0, multidimensional texture is bound to the framebuffer for layered rendering
+		 * If layer = 0, texture is bound to the framebuffer for layered rendering
 		*/
 		void addColorTarget(TextureArray* target,  bool transferOwnership, uint32_t layer);
 
-
+		/**
+		 * Adds depth target to a framebuffer
+		 * * If layer = 0, texture is bound to the framebuffer for layered rendering
+		*/
 		void addDepthTarget(TextureArray* target, bool transferOwnership, uint32_t layer);
+
 		void loadFramebuffer();
         const ITexture& getColorTarget(uint32_t index) const;
 		const ITexture& getDepthTarget() const;
@@ -33,6 +37,10 @@ namespace Cala {
 	private:
 		struct Target {
 			Target(ITexture* _target = nullptr, bool _owned = false, uint32_t _layer = 0);
+			Target(const Target& other) = delete;
+			Target(Target&& other) noexcept;
+			Target& operator=(const Target& other) = delete;
+			Target& operator=(Target&& other) noexcept;
 			~Target();
 			ITexture* operator->();
 

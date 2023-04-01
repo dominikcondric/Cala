@@ -14,7 +14,8 @@ namespace Cala {
         Specification spec(images[0].getDimensions().x, images[0].getDimensions().y, 
             (images[0].getChannelCount() == 4) ? Format::RGBA : Format::RGB, Dimensionality::TwoDimensional);
         spec.writeOnly = false;
-        generateTextureArray(spec, mipmapCount, layerCount);
+        spec.renderingStyle = renderingStyle;
+        generateTextureArray(spec, _mipmapCount, images.size());
     }
 
     void TextureArray::generateTextureArray(const Specification &specification, uint32_t _mipmapCount, uint32_t _layerCount)
@@ -30,11 +31,23 @@ namespace Cala {
 
         switch (dimensionality)
         {
+            case Dimensionality::OneDimensional:
+                // TODO
+                break;
+
             case Dimensionality::TwoDimensional:
                 nativeTextureType = GL_TEXTURE_2D_ARRAY;
                 glBindTexture(nativeTextureType, textureHandle);
                 glTexStorage3D(nativeTextureType, mipmapCount, internalTextureFormat, width, height, layerCount);
                 setTextureParameters(specification);
+                break;
+
+            case Dimensionality::ThreeDimensional:
+                // TODO
+                break;
+
+            case Dimensionality::Cubemap:
+                // TODO
                 break;
         }
 

@@ -30,7 +30,7 @@ namespace Cala {
 		const IOSystem& getIO() const { return *ioSystem.get(); }
 		glm::ivec2 getWindowSize() const;
 		GLFWwindow* const getWindowPointer() const { return windowHandle; }
-		void* const getNativeWindowPointer() const;
+		void* getNativeWindowPointer() const;
 
 	private:
 		Window(const Specification& specification);

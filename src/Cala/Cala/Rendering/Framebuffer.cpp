@@ -21,7 +21,8 @@ namespace Cala {
 
 	Framebuffer& Framebuffer::operator=(Framebuffer&& other) noexcept
 	{
-		memcpy(this, &other, sizeof(Framebuffer));
+		other.colorTargets = std::move(colorTargets);
+		other.depthTarget = std::move(depthTarget);
 		other.framebufferHandle = GL_NONE;
 		return *this;
 	}
@@ -81,7 +82,7 @@ namespace Cala {
 		{
 			uint32_t colorAttachmentEnum[MAX_COLOR_ATTACHMENTS];
 
-			for (int i = 0; i < colorTargets.size(); ++i)
+			for (uint32_t i = 0; i < (uint32_t)colorTargets.size(); ++i)
 			{
 				const ITexture& texture = *colorTargets[i].target;
 				colorAttachmentEnum[i] = GL_COLOR_ATTACHMENT0 + i;
@@ -157,6 +158,20 @@ namespace Cala {
 
     Framebuffer::Target::Target(ITexture *_target, bool _owned, uint32_t _layer) : target(_target), owned(_owned), layer(_layer)
     {
+    }
+
+    Framebuffer::Target::Target(Target &&other) noexcept
+    {
+		*this = std::move(other);
+    }
+
+    Framebuffer::Target& Framebuffer::Target::operator=(Target&& other) noexcept
+    {
+		other.target = target;
+		other.owned = owned;
+		other.layer = layer;
+		owned = false;
+		return *this;
     }
 
     Framebuffer::Target::~Target()

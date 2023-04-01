@@ -69,6 +69,10 @@ namespace Cala {
 
             switch (dimensionality)
             {
+                case Dimensionality::OneDimensional:
+                    // TODO
+                    break;
+
                 case Dimensionality::TwoDimensional:
                 {
                     nativeTextureType = GL_TEXTURE_2D;
@@ -77,6 +81,10 @@ namespace Cala {
                     setTextureParameters(specification);
                     break;
                 }
+
+                 case Dimensionality::ThreeDimensional:
+                    // TODO
+                    break;
 
                 case Dimensionality::Cubemap:
                 {

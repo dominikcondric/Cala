@@ -89,7 +89,7 @@ namespace Cala {
 		return glm::ivec2(w, h);
 	}
 
-	void* const Window::getNativeWindowPointer() const
+	void* Window::getNativeWindowPointer() const
 	{
 	#if defined GLFW_EXPOSE_NATIVE_WIN32
 		return glfwGetWin32Window(windowHandle);

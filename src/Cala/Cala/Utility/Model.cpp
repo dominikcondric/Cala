@@ -380,7 +380,7 @@ namespace Cala {
 		std::vector<uint32_t> oldToNewIndexMapping(vertexCount);
 		std::unordered_map<std::string, uint32_t> vertexMap;
 
-		for (int i = 0; i < vertexCount; i++)
+		for (uint32_t i = 0; i < vertexCount; i++)
 		{
 			glm::vec3 vertex(vertexData[i * 8], vertexData[i * 8 + 1], vertexData[i * 8 + 2]);
 			auto mapIterator = vertexMap.find(glm::to_string(vertex));
@@ -397,7 +397,7 @@ namespace Cala {
 			}
 		}
 
-		for (int i = 0; i < indexCount; ++i)
+		for (uint32_t i = 0; i < indexCount; ++i)
 		{
 			uint32_t oldIndex = indexData[i];
 			newIndices[i] = oldToNewIndexMapping[oldIndex];

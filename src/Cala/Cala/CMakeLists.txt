@@ -43,6 +43,13 @@ add_library(Cala STATIC
     ${src_files}
 )
 
+if(MSVC)
+  target_compile_options(Cala PRIVATE /Wall)
+else()
+  target_compile_options(Cala PRIVATE -Wall -Wextra -Wpedantic)
+endif()
+
+
 target_compile_definitions(Cala 
     PUBLIC 
         SHADERS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Rendering/Shaders/"
