@@ -37,7 +37,7 @@ namespace Cala {
 		uint32_t attachedShaders = 0;
 
 	#ifdef CALA_API_OPENGL
-		GLuint programHandle;
+		GLuint programHandle = API_NULL;
 		std::vector<GLuint> shaderHandlesBuffer;
 	#endif
 	};

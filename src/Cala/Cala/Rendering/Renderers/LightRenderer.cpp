@@ -56,7 +56,7 @@ namespace Cala {
 			lights.push_back(light);
 	}
 
-	void LightRenderer::updateLight(const Light& light, uint32_t lightIndex, GraphicsAPI* const api)
+	void LightRenderer::updateLight(const Light& light, uint32_t lightIndex)
 	{
 		/** 
 		 * Setting up light uniforms
@@ -133,7 +133,7 @@ namespace Cala {
 
 		for (uint32_t lightCounter = 0U; lightCounter < lights.size(); ++lightCounter)
 		{
-			updateLight(lights[lightCounter], lightCounter, api);
+			updateLight(lights[lightCounter], lightCounter);
 		}
 		lights.clear();
 

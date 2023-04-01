@@ -17,9 +17,10 @@ namespace Cala {
 			Renderable(const Mesh& _mesh, const Transformation& _transformation, const glm::vec4& _color,
 				const Texture* _diffuseMap, const Texture* _specularMap, const Texture* _normalMap,
 				float _ambientCoefficient, float _diffuseCoefficient, float _specularCoefficient, float _shininess) :
-				mesh(_mesh), transformation(_transformation), ambientCoefficient(_ambientCoefficient),
-				diffuseCoefficient(_diffuseCoefficient), specularCoefficient(_specularCoefficient), color(_color),
-				shininess(_shininess), diffuseMap(_diffuseMap), specularMap(_specularMap), normalMap(_normalMap)
+				mesh(_mesh), transformation(_transformation), color(_color), diffuseMap(_diffuseMap), 
+				specularMap(_specularMap), normalMap(_normalMap), ambientCoefficient(_ambientCoefficient),
+				diffuseCoefficient(_diffuseCoefficient), specularCoefficient(_specularCoefficient),
+				shininess(_shininess)
 			{
 			}
 
@@ -46,7 +47,7 @@ namespace Cala {
 
 			Light(Type _type, const Transformation& _transformation, float _intensity,
 				const glm::vec3& _color, float _spotlightCutoff, bool _shadowCaster) :
-				type(_type), transformation(_transformation), color(_color), intensity(_intensity),
+				type(_type), intensity(_intensity), color(_color), transformation(_transformation),
 				spotlightCutoff(_spotlightCutoff), shadowCaster(_shadowCaster) {}
 			Light(const Transformation& _transformation) : transformation(_transformation) {}
 
@@ -64,7 +65,7 @@ namespace Cala {
         bool shadows = true;
 
     private:
-        void updateLight(const Light &light, uint32_t lightIndex, GraphicsAPI *const api);
+        void updateLight(const Light &light, uint32_t lightIndex);
 		std::vector<Renderable> renderables[8];
 		std::vector<Light> lights;
 		Shader mainShader;

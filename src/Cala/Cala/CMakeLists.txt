@@ -44,7 +44,7 @@ add_library(Cala STATIC
 )
 
 if(MSVC)
-  target_compile_options(Cala PRIVATE /Wall)
+  target_compile_options(Cala PRIVATE /W4)
 else()
   target_compile_options(Cala PRIVATE -Wall -Wextra -Wpedantic)
 endif()

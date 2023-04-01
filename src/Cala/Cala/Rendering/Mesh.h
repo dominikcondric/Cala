@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include "Cala/Utility/Model.h"
+#include "NativeAPI.h"
 
 namespace Cala {
 	class Mesh {
@@ -34,10 +35,10 @@ namespace Cala {
 	protected:
 		uint32_t vertexCount{ 0 };
 		uint32_t indexCount{ 0 };
-		uint32_t drawingMode;
-		uint32_t vbo = 0;
-		uint32_t ebo = 0;
-		uint32_t vao = 0;
+		GLenum drawingMode;
+		GLuint vbo = API_NULL;
+		GLuint ebo = API_NULL;
+		GLuint vao = API_NULL;
 	};
 }
 
