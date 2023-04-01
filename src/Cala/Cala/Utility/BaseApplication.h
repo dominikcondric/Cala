@@ -1,12 +1,8 @@
 #pragma once
-
-#include <Cala/Utility/Model.h>
-#include <Cala/Rendering/Texture.h>
-#include <Cala/Rendering/Renderers/LightRenderer.h>
-#include <Cala/Rendering/Renderers/SimpleRenderer.h>
 #include "Cala/Utility/Window.h"
-#include <glm/gtc/random.hpp>
 #include "Time.h"
+#include "Cala/Rendering/Camera.h"
+#include "Cala/Rendering/GraphicsAPI.h"
 
 namespace Cala {
 	class BaseApplication {
@@ -16,8 +12,8 @@ namespace Cala {
 		void run();
 
 	protected:
-		Unique<Window> window;
-		Unique<GraphicsAPI> api;
+		std::unique_ptr<Window> window;
+		std::unique_ptr<GraphicsAPI> api;
 		PerspectiveCamera camera;
 		Time time;
 

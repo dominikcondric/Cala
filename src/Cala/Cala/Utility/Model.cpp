@@ -2,7 +2,7 @@
 #include <glm/gtc/constants.hpp>
 #include <unordered_map>
 #include <glm/gtx/string_cast.hpp>
-#include "Core.h"
+#include "Logger.h"
 
 namespace Cala {
 	Model& Model::loadSphere(uint32_t stackCount, uint32_t sectorCount, float radius)
@@ -191,7 +191,7 @@ namespace Cala {
 		const std::vector<glm::vec2>& textureCoordinates, const std::vector<uint32_t>& indices) const
 	{
 		if (vertices.size() == 0 || indices.size() == 0)
-			LOG_ERROR("Cannot calculate tangents, vertex data is empty");
+			Logger::getInstance().logErrorToConsole("Cannot calculate tangents, vertex data is empty");
 
 		struct Triangle {
 			// Positions

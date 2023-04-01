@@ -7,8 +7,8 @@ struct GLFWwindow;
 namespace Cala {
 	class IOSystem {
 	public:
-		IOSystem(GLFWwindow* windowPointer);
-		~IOSystem() = default;
+		static IOSystem* construct(GLFWwindow* windowPointer);
+		~IOSystem();
 		void update();
 
 		enum KeyCode {
@@ -50,8 +50,8 @@ namespace Cala {
 		glm::vec2 getCursorOffset() const;
 
 	private:
+		IOSystem(GLFWwindow* windowPointer);
 		using LibraryCode = int;
-
 		std::vector<bool> keyStates;
 		GLFWwindow* windowHandle = nullptr;
 		double cursorX{ 512.f }, cursorY{ 384.f };
@@ -59,5 +59,6 @@ namespace Cala {
 		LibraryCode mapEngineToLibraryKey(KeyCode code) const;
 		constexpr LibraryCode mapLibraryToEngineKey(LibraryCode code) const;
 		constexpr LibraryCode calculate(LibraryCode code, LibraryCode code1, LibraryCode code2, char op) const;
+		static IOSystem* instance;
 	};
 }

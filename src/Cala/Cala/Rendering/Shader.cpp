@@ -5,11 +5,13 @@
 #include <iostream>
 #include "Shader.h"
 #include <cstring>
-#include <glad/glad.h>
-#include "Cala/Utility/Core.h"
+#include "Cala/Utility/Logger.h"
+
+#define BIT(x) (1 << x)
 
 namespace Cala {
-#if CALA_API == CALA_API_OPENGL
+#ifdef CALA_API_OPENGL
+#include <glad/glad.h>
 	Shader::Shader(Shader&& other) noexcept
 	{
 		*this = std::move(other);
@@ -18,33 +20,35 @@ namespace Cala {
 	Shader& Shader::operator=(Shader&& other) noexcept
 	{
 		memcpy(this, &other, sizeof(Shader));
-		other.programID = GL_NONE;
+		other.programHandle = GL_NONE;
 		return *this;
 	}
 
 	Shader::~Shader()
 	{
-		glDeleteProgram(programID);
+		glDeleteProgram(programHandle);
 	}
 
 	void Shader::attachShader(ShaderType shaderStage, const std::filesystem::path& filePath)
 	{
-		if (programID != GL_NONE)
+		Logger& logger = Logger::getInstance();
+
+		if (programHandle != GL_NONE)
 		{
 			attachedShaders = 0;
-			glDeleteProgram(programID);
+			glDeleteProgram(programHandle);
 		}
 
 		if (attachedShaders & BIT((uint32_t)shaderStage))
 		{
-			LOG("Error: shader stage already attached!");
+			logger.logErrorToConsole("Error: shader stage already attached!");
 			return;
 		}
 
 		if ((attachedShaders && shaderStage == ShaderType::ComputeShader && !(attachedShaders & BIT((uint32_t)ShaderType::ComputeShader)))
 			|| ((attachedShaders & BIT((uint32_t)ShaderType::ComputeShader)) && shaderStage != ShaderType::ComputeShader))
 		{
-			LOG("Error: Can't mix compute and drawing shaders!");
+			logger.logErrorToConsole("Error: Can't mix compute and drawing shaders!");
 			return;
 		}
 
@@ -88,42 +92,42 @@ namespace Cala {
 		}
 
 		attachedShaders |= BIT((uint32_t)shaderStage);
-		shaderIDBuffer.push_back(shaderID);
+		shaderHandlesBuffer.push_back(shaderID);
 	}
 
 	void Shader::createProgram()
 	{
-		if (programID)
+		if (programHandle)
 		{
-			LOG("Error: Program already created!");
+			Logger::getInstance().logErrorToConsole("Error: Program already created!");
 			return;
 		}
 
 		char infoLog[512];
 		GLint success;
-		programID = glCreateProgram();
-		for (const auto& shader : shaderIDBuffer)
+		programHandle = glCreateProgram();
+		for (const auto& shader : shaderHandlesBuffer)
 		{
-			glAttachShader(programID, shader);
+			glAttachShader(programHandle, shader);
 		}
 
-		glLinkProgram(programID);
-		glGetProgramiv(programID, GL_LINK_STATUS, &success);
+		glLinkProgram(programHandle);
+		glGetProgramiv(programHandle, GL_LINK_STATUS, &success);
 		if (!success) {
-			glGetProgramInfoLog(programID, 512, nullptr, infoLog);
+			glGetProgramInfoLog(programHandle, 512, nullptr, infoLog);
 			std::cout << "Failed to link program: " << infoLog << std::endl;
 		}
 
-		for (const auto& shader : shaderIDBuffer)
+		for (const auto& shader : shaderHandlesBuffer)
 		{
-			glDetachShader(programID, shader);
+			glDetachShader(programHandle, shader);
 			glDeleteShader(shader);
 		}
 	}
 
 	void Shader::activate() const
 	{
-		glUseProgram(programID);
+		glUseProgram(programHandle);
 	}
 
 	void Shader::dispatchComputeShader(uint32_t workGroupX, uint32_t workGroupY, uint32_t workGroupZ) const
@@ -136,44 +140,44 @@ namespace Cala {
 
 	void Shader::attachConstantBuffer(ConstantBuffer* buffer, const std::string& bufferName) const
 	{
-		if (programID == GL_NONE)
+		if (programHandle == GL_NONE)
 			return;
 
-		int blockIndex = glGetUniformBlockIndex(programID, bufferName.c_str());
+		int blockIndex = glGetUniformBlockIndex(programHandle, bufferName.c_str());
 
 		if (blockIndex == GL_INVALID_INDEX)
 		{
-			 LOG("Invalid block index");
+			Logger::getInstance().logErrorToConsole("Invalid block index");
 			return;
 		}
 
-		glUniformBlockBinding(programID, blockIndex, buffer->getBindingPoint());
+		glUniformBlockBinding(programHandle, blockIndex, buffer->getBindingPoint());
 	}
 
 	ConstantBuffer::ConstantBufferInfo Shader::getConstantBufferInfo(const std::string& bufferName) const
 	{
 		ConstantBuffer::ConstantBufferInfo bufferInfo;
-		GLint blockIndex = glGetUniformBlockIndex(programID, bufferName.c_str());
+		GLint blockIndex = glGetUniformBlockIndex(programHandle, bufferName.c_str());
 		if (blockIndex == -1)
 			return bufferInfo;
 
-		glGetActiveUniformBlockiv(programID, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &bufferInfo.size);
+		glGetActiveUniformBlockiv(programHandle, blockIndex, GL_UNIFORM_BLOCK_DATA_SIZE, &bufferInfo.size);
 		GLint indices[1000];
 		GLint indicesCount = 0;
-		glGetActiveUniformBlockiv(programID, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &indicesCount);
-		glGetActiveUniformBlockiv(programID, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices);
-		glGetActiveUniformBlockiv(programID, blockIndex, GL_UNIFORM_BLOCK_BINDING, &bufferInfo.bindingPoint);
+		glGetActiveUniformBlockiv(programHandle, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &indicesCount);
+		glGetActiveUniformBlockiv(programHandle, blockIndex, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, indices);
+		glGetActiveUniformBlockiv(programHandle, blockIndex, GL_UNIFORM_BLOCK_BINDING, &bufferInfo.bindingPoint);
 
 		bufferInfo.variablesInfo.reserve(indicesCount);
 		for (int i = 0; i < indicesCount; ++i)
 		{
 			ConstantBuffer::ConstantBufferVariableInfo variableInfo;
-			glGetActiveUniformsiv(programID, 1, (GLuint*)&indices[i], GL_UNIFORM_OFFSET, &variableInfo.offset);
-			glGetActiveUniformsiv(programID, 1, (GLuint*)&indices[i], GL_UNIFORM_ARRAY_STRIDE, &variableInfo.arrayStride);
-			glGetActiveUniformsiv(programID, 1, (GLuint*)&indices[i], GL_UNIFORM_MATRIX_STRIDE, &variableInfo.matrixStride);
+			glGetActiveUniformsiv(programHandle, 1, (GLuint*)&indices[i], GL_UNIFORM_OFFSET, &variableInfo.offset);
+			glGetActiveUniformsiv(programHandle, 1, (GLuint*)&indices[i], GL_UNIFORM_ARRAY_STRIDE, &variableInfo.arrayStride);
+			glGetActiveUniformsiv(programHandle, 1, (GLuint*)&indices[i], GL_UNIFORM_MATRIX_STRIDE, &variableInfo.matrixStride);
 			variableInfo.indexInBlock = indices[i];
 			GLchar name[50];
-			glGetActiveUniformName(programID, indices[i], 50, nullptr, name);
+			glGetActiveUniformName(programHandle, indices[i], 50, nullptr, name);
 			bufferInfo.variablesInfo.insert(std::make_pair(std::string(name), variableInfo));
 		}
 

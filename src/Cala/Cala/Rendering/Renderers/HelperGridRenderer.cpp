@@ -16,7 +16,7 @@ namespace Cala {
 		transformation.scale(glm::vec3((float)gridSize));
 	}
 
-	void HelperGridRenderer::render(const GraphicsAPI* api, const Camera& camera)
+	void HelperGridRenderer::render(GraphicsAPI* const api, const Camera& camera)
 	{
 		shader.activate();
 		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));

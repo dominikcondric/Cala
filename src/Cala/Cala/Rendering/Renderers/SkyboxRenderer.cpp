@@ -15,7 +15,7 @@ namespace Cala {
 		skyboxBlurBuffer.updateData("blurValue", &blurLevel, sizeof(int));
 	}
 
-	void SkyboxRenderer::render(const GraphicsAPI* api, const Camera& camera)
+	void SkyboxRenderer::render(GraphicsAPI* const api, const Camera& camera)
 	{
 		if (texture == nullptr) {
 			return;

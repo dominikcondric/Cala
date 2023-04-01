@@ -7,7 +7,7 @@ namespace Cala {
 	public:
 		SkyboxRenderer(Texture* tex);
 		~SkyboxRenderer() override = default;
-		void render(const GraphicsAPI* api, const Camera& camera) override;
+		void render(GraphicsAPI* const api, const Camera& camera) override;
 		void setTexture(Texture* tex) { texture = tex; }
 
 	private:

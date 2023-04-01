@@ -3,13 +3,15 @@
 #include "Cala/Rendering/GraphicsAPI.h"
 #include "Cala/Rendering/Shader.h"
 #include "Cala/Rendering/ConstantBuffer.h"
+#include "IRenderer.h"
 
 namespace Cala {
-	class PostProcessor {
+	class PostProcessingRenderer : IRenderer {
 	public:
-		PostProcessor();
-		~PostProcessor() = default;
+		PostProcessingRenderer();
+		~PostProcessingRenderer() = default;
 		void begin(GraphicsAPI* api);
+		void render(GraphicsAPI* const api, const Camera& camera) override;
 
 		enum PostProcessingEffect {
 			Bloom = 0,
@@ -20,8 +22,7 @@ namespace Cala {
 			Negative = 5
 		};
 
-		void applyEffects(GraphicsAPI* api, std::vector<std::pair<PostProcessingEffect, float>> effects);
-
+		void pushEffect(PostProcessingEffect effect, float effectValue);
 
 	private:
 		enum HelperPostProcessingEffect {
@@ -31,9 +32,10 @@ namespace Cala {
 			Copy = 9
 		};
 
-		void applyEffect(const GraphicsAPI* api, PostProcessingEffect effect, float effectValue);
-		void applyBloom(const GraphicsAPI* api, int bloomValue);
+		void applyEffect(GraphicsAPI* const api, PostProcessingEffect effect, float effectValue);
+		void applyBloom(GraphicsAPI* const api, int bloomValue);
 
+		std::vector<std::pair<PostProcessingEffect, float>> effects;
 		bool beginCalled = false;
 		Framebuffer helperFramebuffers[3];
 		Mesh renderingQuad;
@@ -41,5 +43,6 @@ namespace Cala {
 		Shader shader;
 		ConstantBuffer effectsBuffer;
 		glm::uvec4 sceneViewport;
+		const glm::uvec2 framebufferTargetsSize{ 1920, 1080 };
 	};
 }

@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include "IOSystem.h"
-#include "Core.h"
 #include "Time.h"
 
 struct GLFWwindow;
@@ -38,10 +37,10 @@ namespace Cala {
 		static void windowResizeCallback(GLFWwindow* window, int w, int h);
 		void createContext() const;
 
-		Unique<IOSystem> ioSystem;
+		std::unique_ptr<IOSystem> ioSystem;
 		GLFWwindow* windowHandle = nullptr;
 		std::string windowName;
 		bool resized = false;
-		static bool initialized;
+		static Window* instance;
 	};
 }

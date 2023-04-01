@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 
 namespace Cala {
+	IOSystem* IOSystem::instance = nullptr;
+
 	IOSystem::IOSystem(GLFWwindow* windowPointer) : windowHandle(windowPointer)
 	{
 		keyStates.reserve(100);
@@ -9,8 +11,21 @@ namespace Cala {
 			keyStates.push_back(false);
 	}
 
-	void IOSystem::update()
-	{
+    IOSystem *IOSystem::construct(GLFWwindow* windowPointer)
+    {
+        if (!instance)
+			return instance = new IOSystem(windowPointer);
+
+		return instance;
+    }
+
+    IOSystem::~IOSystem()
+    {
+		instance = nullptr;
+    }
+
+    void IOSystem::update()
+    {
 		lastX = cursorX;
 		lastY = cursorY;
 		glfwGetCursorPos(windowHandle, &cursorX, &cursorY);

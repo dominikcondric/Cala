@@ -30,5 +30,5 @@ void main()
 	outAttributes.TBN = mat3(tangent, bitangent, normal);
 	outAttributes.texCoords = in_texCoords;
 
-	gl_Position = projection * view * vec4(outAttributes.fragPosition, 1.0);
+	gl_Position = projection * view * vec4(outAttributes.fragPosition, 1.f);
 }

@@ -2,7 +2,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Window.h"
-#include "Core.h"
+#include "Platform.h"
+#include "Logger.h"
 
 #if defined(CALA_PLATFORM_WINDOWS)
 	#define GLFW_EXPOSE_NATIVE_WIN32
@@ -15,12 +16,12 @@
 #include <GLFW/glfw3native.h>
 
 namespace Cala {
-	bool Window::initialized = false;
+	Window* Window::instance = nullptr;
 
 	Window::Window(const Specification& specification)
 	{
 		if (!glfwInit())
-			LOG_ERROR("Failed to initialize GLFW!");
+			Logger::getInstance().logErrorToConsole("Failed to initialize GLFW!");
 
 		windowName = specification.windowName;
 		glfwWindowHint(GLFW_SAMPLES, specification.sampleCount);
@@ -28,31 +29,29 @@ namespace Cala {
 		if (!windowHandle)
 		{
 			glfwTerminate();
-			LOG_ERROR("Failed to create window!");
+			Logger::getInstance().logErrorToConsole("Failed to create window!");
 			return;
 		}
 
 		glfwSetWindowSizeCallback(windowHandle, windowResizeCallback);
 		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		glfwSetWindowUserPointer(windowHandle, this);
-		ioSystem = std::make_unique<IOSystem>(windowHandle);
+		ioSystem.reset(IOSystem::construct(windowHandle));
 
 		createContext();
 	}
 
 	Window* Window::construct(const Specification& specification)
 	{
-		if (!initialized)
-		{
-			initialized = true;
-			return new Window(specification);
-		}
+		if (!instance)
+			instance = new Window(specification);
 
-		return nullptr;
+		return instance;
 	}
 
 	Window::~Window()
 	{
+		instance = nullptr;
 		glfwMakeContextCurrent(NULL);
 		glfwTerminate();
 	}
@@ -60,11 +59,11 @@ namespace Cala {
 
 	void Window::createContext() const
 	{
-	#if CALA_API == CALA_API_OPENGL
+	#if defined CALA_API_OPENGL
 		glfwMakeContextCurrent(windowHandle);
 
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			LOG_ERROR("Failed to initialize GLAD");
+			Logger::getInstance().logErrorToConsole("Failed to initialize GLAD!");
 		}
 	#else
 		#error Api not supported yet!

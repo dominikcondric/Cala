@@ -35,9 +35,10 @@ namespace Cala {
 
 	private:
 		uint32_t attachedShaders = 0;
-	#if CALA_API == CALA_API_OPENGL
-		GLuint programID = 0;
-		std::vector<GLuint> shaderIDBuffer;
+
+	#ifdef CALA_API_OPENGL
+		GLuint programHandle;
+		std::vector<GLuint> shaderHandlesBuffer;
 	#endif
 	};
 }

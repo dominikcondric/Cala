@@ -8,28 +8,58 @@
 #include "Framebuffer.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include "Cala/Utility/Logger.h"
 
 namespace Cala {
-	bool GraphicsAPI::initialized = false;
+	GraphicsAPI* GraphicsAPI::instance = nullptr;
 
-#if CALA_API == CALA_API_OPENGL
+#ifdef CALA_API_OPENGL
 	GraphicsAPI* GraphicsAPI::construct()
 	{
-		if (!initialized)
-		{
-			initialized = true;
-			return new GraphicsAPI();
-		}
+		if (!instance)
+			instance = new GraphicsAPI;
 
-		return nullptr;
+		return instance;
 	}
 
 	GraphicsAPI::~GraphicsAPI()
 	{
-		initialized = false;
+		instance = nullptr;
 	}
 
-	void GraphicsAPI::setBufferClearingColor(const glm::vec4& color) const
+    void GraphicsAPI::_checkForErrors(const std::string& file, int line)
+    {
+		GLenum errorCode = GL_NO_ERROR;
+		while ((errorCode = glGetError()) != GL_NO_ERROR)
+		{
+			const char* error = nullptr;
+			switch (errorCode)
+			{
+				case GL_INVALID_ENUM: 
+					error = "INVALID ENUM";
+					break;
+				case GL_INVALID_VALUE:
+					error = "INVALID VALUE";
+					break;
+				case GL_INVALID_OPERATION:
+					error = "INVALID OPERATION";
+					break;
+				case GL_OUT_OF_MEMORY:
+					error = "OUT OF MEMORY";
+					break;
+				case GL_INVALID_FRAMEBUFFER_OPERATION:
+					error = "INVALID FRAMEBUFFER OPERATION";
+					break;
+			}
+
+			std::string errorMessage(error);
+			errorMessage += " in: " + file +  " (line ";
+			errorMessage += std::to_string(line) + ")";
+			Logger::getInstance().logErrorToConsole(errorMessage);
+		}
+    }
+
+    void GraphicsAPI::setBufferClearingColor(const glm::vec4& color) const
 	{
 		glClearColor(color.x, color.y, color.z, color.w);
 	}
@@ -37,9 +67,15 @@ namespace Cala {
 	void GraphicsAPI::setBufferClearingBits(bool color, bool depth, bool stencil)
 	{
 		bufferClearingBitmask = 0;
-		if (color) bufferClearingBitmask |= GL_COLOR_BUFFER_BIT;
-		if (depth) bufferClearingBitmask |= GL_DEPTH_BUFFER_BIT;
-		if (stencil) bufferClearingBitmask |= GL_STENCIL_BUFFER_BIT;
+		
+		if (color)
+			bufferClearingBitmask |= GL_COLOR_BUFFER_BIT;
+
+		if (depth)
+			bufferClearingBitmask |= GL_DEPTH_BUFFER_BIT;
+
+		if (stencil)
+			bufferClearingBitmask |= GL_STENCIL_BUFFER_BIT;
 	}
 
 	void GraphicsAPI::setViewport(const glm::ivec4& viewport)
@@ -57,11 +93,6 @@ namespace Cala {
 	void GraphicsAPI::setRenderingPointSize(float size) const
 	{
 		glPointSize(size);
-	}
-
-	void GraphicsAPI::activateDefaultFramebuffer() const
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void GraphicsAPI::readFromBoundFramebuffer(const glm::uvec2& pixelCoordinats, const glm::uvec2& areaSize, DataType type, void* dataToWrite) const
@@ -83,7 +114,20 @@ namespace Cala {
 		glReadPixels(pixelCoordinats.x, pixelCoordinats.y, areaSize.x, areaSize.y, GL_FLOAT, dataType, dataToWrite);
 	}
 
-	void GraphicsAPI::enableSetting(Constant setting) const
+    void GraphicsAPI::activateDefaultFramebuffer()
+    {
+		glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
+		activeFramebuffer = nullptr;
+    }
+
+    void GraphicsAPI::activateFramebuffer(const Framebuffer& framebuffer)
+    {
+		GLuint framebufferID = framebuffer.getNativeFramebufferHandle();
+		glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+		activeFramebuffer = &framebuffer;
+    }
+
+    void GraphicsAPI::enableSetting(Constant setting) const
 	{
 		glEnable(mapConstant(setting));
 	}

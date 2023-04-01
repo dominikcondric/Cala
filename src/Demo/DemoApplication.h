@@ -1,5 +1,7 @@
 #pragma once
 #include "Cala/Utility/BaseApplication.h"
+#include "Cala/Rendering/Renderers/LightRenderer.h"
+#include "Cala/Rendering/Renderers/SimpleRenderer.h"
 
 using namespace Cala;
 
@@ -11,11 +13,13 @@ public:
 private:
 	void loop() override;
 
-	Mesh sphereMesh;
+	Mesh sphereMesh, cubeMesh, planeMesh;
+	Transformation planeTransform;
+	std::array<Transformation, 4> wallTransforms;
 	SimpleRenderer simpleRenderer;
 	LightRenderer lightRenderer;
-	std::vector<Texture> diffuseMaps, normalMaps;
+	// std::vector<Texture> diffuseMaps, normalMaps;
 	std::vector<LightRenderer::Renderable> renderables;
-	LightRenderer::Light light;
-	SimpleRenderer::Renderable lightRenderable;
+	std::vector<Transformation> transformations;
+	Transformation lightTransformation;
 };

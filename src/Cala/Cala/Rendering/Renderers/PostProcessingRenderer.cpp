@@ -1,18 +1,33 @@
-#include "PostProcessor.h"
-#include "Cala/Utility/Core.h"
+#include "PostProcessingRenderer.h"
 #include <algorithm>
+#include "Cala/Utility/Logger.h"
 
 namespace Cala {
-	PostProcessor::PostProcessor()
+	PostProcessingRenderer::PostProcessingRenderer()
 	{
 		std::filesystem::path shadersDir(SHADERS_DIR);
 		shader.attachShader(Shader::ShaderType::VertexShader, shadersDir / "PostProcessingVertexShader.glsl");
 		shader.attachShader(Shader::ShaderType::FragmentShader, shadersDir / "PostProcessingFragmentShader.glsl");
 		shader.createProgram();
 
-		helperFramebuffers[0].generateRenderingTarget(1024, 768, 1);
-		helperFramebuffers[1].generateColorBuffer(1024, 768, 1);
-		helperFramebuffers[2].generateColorBuffer(1024, 768, 1);
+		Texture::Specification texSpec(framebufferTargetsSize.x, framebufferTargetsSize.y, ITexture::Format::RGBA, Texture::Dimensionality::TwoDimensional);
+		for (int i = 0; i < 3; ++i)
+		{
+			Texture* colorTarget = new Texture;
+			colorTarget->generateTexture(texSpec, nullptr);
+			helperFramebuffers[i].addColorTarget(colorTarget, true);
+
+			if (i == 0)
+			{
+				Texture* depthTarget = new Texture;
+				Texture::Specification depthTexSpec(
+					framebufferTargetsSize.x, framebufferTargetsSize.y, Texture::Format::DEPTH24_STENCIL8, Texture::Dimensionality::TwoDimensional);
+				depthTarget->generateTexture(depthTexSpec, nullptr);
+				helperFramebuffers[i].addDepthTarget(depthTarget, true);
+			}
+
+			helperFramebuffers[i].loadFramebuffer();
+		}	
 
 		effectsBuffer.setData(shader.getConstantBufferInfo("EffectValues"), true);
 
@@ -30,34 +45,32 @@ namespace Cala {
 
 		quadModel.loadCustomModel(renderingQuadVertices, 4, {}, modelLayouts, Model::DrawingMode::TriangleStrip);
 		renderingQuad.loadMesh(quadModel, false);
+
+		effects.reserve(5);
 	}
 
-	void PostProcessor::begin(GraphicsAPI* api)
+	void PostProcessingRenderer::begin(GraphicsAPI* api)
 	{
 		if (beginCalled) 
 		{
-			LOG_ERROR("Begin already called!");
+			Logger::getInstance().logErrorToConsole("Begin already called!");
 			return;
 		}
 
 		// Setup offscreen framebuffer
 		sceneViewport = api->getCurrentViewport();
-		helperFramebuffers[0].activate();
+		api->activateFramebuffer(helperFramebuffers[0]);
 		api->clearFramebuffer();
-		const glm::uvec2& renderingDims = helperFramebuffers[0].getRenderingTargetDimensions();
-		api->setViewport({ 0, 0, renderingDims.x, renderingDims.y });
+		api->setViewport({ 0, 0, framebufferTargetsSize.x, framebufferTargetsSize.y });
 
-		api->disableSetting(GraphicsAPI::DepthTesting);
-		api->disableSetting(GraphicsAPI::FaceCulling);
-		api->setPolygonFillingMode(GraphicsAPI::FrontAndBack, GraphicsAPI::Fill);
 		beginCalled = true;
 	}
 
-	void PostProcessor::applyEffects(GraphicsAPI* api, std::vector<std::pair<PostProcessingEffect, float>> effects)
+	void PostProcessingRenderer::render(GraphicsAPI* api, const Camera& camera)
 	{
 		if (!beginCalled)
 		{
-			LOG_ERROR("Begin not called!");
+			Logger::getInstance().logErrorToConsole("Begin not called!");
 			return;
 		}
 
@@ -76,22 +89,31 @@ namespace Cala {
 		}
 
 		shader.activate();
+		api->disableSetting(GraphicsAPI::DepthTesting);
+		api->disableSetting(GraphicsAPI::FaceCulling);
+		api->setPolygonFillingMode(GraphicsAPI::FrontAndBack, GraphicsAPI::Fill);
+
 		for (const auto& [effect, value] : effects)
 			applyEffect(api, effect, value);
 
+		effects.clear();
 		api->activateDefaultFramebuffer();
-		api->clearFramebuffer();
 		api->setViewport(sceneViewport);
 		uint32_t effect = Copy;
 		effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));
-		helperFramebuffers[currentFB].applyColorTexture(0, 0);
+		helperFramebuffers[currentFB].getColorTarget(0).setForSampling(0);
 		api->render(renderingQuad);
 		currentFB = 0;
 		beginCalled = false;
 	}
 
-	void PostProcessor::applyEffect(const GraphicsAPI* api, PostProcessingEffect effect, float effectValue)
-	{
+    void PostProcessingRenderer::pushEffect(PostProcessingEffect effect, float effectValue)
+    {
+		effects.emplace_back(effect, effectValue);
+    }
+
+    void PostProcessingRenderer::applyEffect(GraphicsAPI *const api, PostProcessingEffect effect, float effectValue)
+    {
 		const Framebuffer& fb0 = helperFramebuffers[0];
 		const Framebuffer& fb1 = helperFramebuffers[1];
 		const Framebuffer& fb2 = helperFramebuffers[2];
@@ -102,18 +124,18 @@ namespace Cala {
 				if (effect == PostProcessingEffect::Bloom)
 					applyBloom(api, (int)effectValue);
 
-				fb1.activate();
-				fb0.applyColorTexture(0, 0);
+				api->activateFramebuffer(fb1);
+				fb0.getColorTarget(0).setForSampling(0);
 				currentFB = 1;
 				break;
 			case 1:
-				fb0.activate();
-				fb1.applyColorTexture(0, 0);
+				api->activateFramebuffer(fb0);
+				fb1.getColorTarget(0).setForSampling(0);
 				currentFB = 0;
 				break;
 			case 2:
-				fb0.activate();
-				fb2.applyColorTexture(0, 0);
+				api->activateFramebuffer(fb0);
+				fb2.getColorTarget(0).setForSampling(0);
 				currentFB = 0;
 				break;
 		}
@@ -123,32 +145,32 @@ namespace Cala {
 		api->render(renderingQuad);
 	}
 
-	void PostProcessor::applyBloom(const GraphicsAPI* api, int bloomIntensity)
+	void PostProcessingRenderer::applyBloom(GraphicsAPI* const api, int bloomIntensity)
 	{
 		const Framebuffer& fb1 = helperFramebuffers[1];
 		const Framebuffer& fb2 = helperFramebuffers[2];
 
-		fb2.activate();
-		helperFramebuffers[currentFB].applyColorTexture(0, 0);
+		api->activateFramebuffer(fb2);
+		helperFramebuffers[currentFB].getColorTarget(0).setForSampling(0);
 		uint32_t effect = HelperPostProcessingEffect::Extract;
 		effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));
 		api->render(renderingQuad);
 
 		for (int i = 0; i < bloomIntensity; ++i)
 		{
-			fb1.activate();
-			fb2.applyColorTexture(0, 0);
+			api->activateFramebuffer(fb1);
+			fb2.getColorTarget(0).setForSampling(0);
 			effect = HelperPostProcessingEffect::HorizontalGaussianBlur;
 			effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));
 			api->render(renderingQuad);
 
-			fb2.activate();
-			fb1.applyColorTexture(0, 0);
+			api->activateFramebuffer(fb2);
+			fb1.getColorTarget(0).setForSampling(0);
 			effect = HelperPostProcessingEffect::VerticalGaussianBlur;
 			effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));
 			api->render(renderingQuad);
 		}
 
-		fb2.applyColorTexture(1, 0);
+	fb2.getColorTarget(0).setForSampling(1);
 	}
 }

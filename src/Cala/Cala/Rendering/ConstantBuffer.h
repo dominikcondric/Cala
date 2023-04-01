@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string>
 #include <unordered_map>
+#include "NativeAPI.h"
 
 typedef uint32_t GLuint;
 
@@ -38,8 +39,10 @@ namespace Cala {
 
 	private:
 		ConstantBufferInfo specification;
-	#if CALA_API == CALA_API_OPENGL
-		GLuint bufferID = 0;
+		mutable bool errorOccured = false;
+
+	#ifdef CALA_API_OPENGL
+		GLuint bufferHandle = API_NULL;
 		static std::unordered_map<uint32_t, GLuint> bindingPointsCache;
 	#endif
 	};

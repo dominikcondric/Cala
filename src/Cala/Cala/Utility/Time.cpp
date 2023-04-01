@@ -3,16 +3,16 @@
 
 void Cala::Time::update()
 {
-	lastTime = runningTime;
+	lastRunningTime = runningTime;
 	runningTime = glfwGetTime();
 	lastDeltaTime = deltaTime;
-	deltaTime = float(runningTime - lastTime);
+	deltaTime = float(runningTime - lastRunningTime);
 	frameRate = 1.f / deltaTime;
 }
 
 void Cala::Time::incrementalUpdate()
 {
 	runningTime = glfwGetTime();
-	deltaTime = runningTime - lastTime;
+	deltaTime = runningTime - lastRunningTime;
 	frameRate = 1.f / deltaTime;
 }

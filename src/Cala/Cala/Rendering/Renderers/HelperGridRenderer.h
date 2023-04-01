@@ -12,7 +12,7 @@ namespace Cala {
 	public:
 		HelperGridRenderer();
 		~HelperGridRenderer() = default;
-		void render(const GraphicsAPI* api, const Camera& camera) override;
+		void render(GraphicsAPI* const api, const Camera& camera) override;
 
 	private:
 		Shader shader;

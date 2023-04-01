@@ -1,9 +1,10 @@
 #include "Mesh.h"
 #include <cstring>
 #include <glad/glad.h>
+#include "NativeAPI.h"
 
 namespace Cala {
-#if CALA_API == CALA_API_OPENGL
+#ifdef CALA_API_OPENGL
 	Mesh::Mesh(const Model& model, bool dynamic)
 	{
 		loadMesh(model, dynamic);
@@ -23,7 +24,6 @@ namespace Cala {
 
 	Mesh& Mesh::operator=(Mesh&& other) noexcept
 	{
-		meshFile = std::move(other.meshFile);
 		vao = other.vao;
 		ebo = other.ebo;
 		vbo = other.vbo;
@@ -38,7 +38,6 @@ namespace Cala {
 
 	void Mesh::loadMesh(const Model& model, bool dynamic)
 	{
-		meshFile = model.getModelPath();
 		setVertexBufferData(model.getVertexData(), model.getVertexCount(), model.getLayoutSpecification(), dynamic);
 		if (model.getIndexCount() != 0)
 			setIndexBufferData(model.getIndexData(), dynamic);
@@ -61,7 +60,7 @@ namespace Cala {
 
 		for (const auto& layout : layouts)
 		{
-			glVertexAttribPointer(layout.index, layout.componentCount, GL_FLOAT, GL_FALSE, layout.strideInBytes, (void*)layout.offsetInBytes);
+			glVertexAttribPointer(layout.index, layout.componentCount, GL_FLOAT, GL_FALSE, layout.strideInBytes, (void*)(uintptr_t)layout.offsetInBytes);
 			glEnableVertexAttribArray(layout.index);
 		}
 

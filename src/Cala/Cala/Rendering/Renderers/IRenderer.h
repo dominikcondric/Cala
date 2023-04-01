@@ -8,6 +8,6 @@ namespace Cala {
 	public:
 		IRenderer() = default;
 		virtual ~IRenderer() = default;
-		virtual void render(const GraphicsAPI* api, const Camera& camera) = 0;
+		virtual void render(GraphicsAPI* const api, const Camera& camera) = 0;
 	};
 }

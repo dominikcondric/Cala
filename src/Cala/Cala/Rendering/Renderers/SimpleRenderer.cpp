@@ -14,18 +14,11 @@ namespace Cala {
 		materialsBuffer.updateData("lightened", &lightened, sizeof(uint32_t));
 	}
 
-	void SimpleRenderer::render(const GraphicsAPI* api, const Camera& camera)
+	void SimpleRenderer::render(GraphicsAPI* const api, const Camera& camera)
 	{
 		shader.activate();
-		if (camera.projectionChanged)
-		{
-			mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
-		}
-
-		if (camera.viewChanged)
-		{
-			mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
-		}
+		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
+		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
 
 		int lightened = 0;
 		materialsBuffer.updateData("lightened", &lightened, sizeof(int));
@@ -34,7 +27,7 @@ namespace Cala {
 		api->enableSetting(GraphicsAPI::DepthTesting);
 		while (!renderablesStack.empty())
 		{
-			const auto& renderable = *renderablesStack.top();
+			const auto& renderable = renderablesStack.top();
 			materialsBuffer.updateData("material.color", &renderable.color.x, sizeof(glm::vec4));
 			mvpBuffer.updateData("model", &renderable.transformation.getTransformMatrix()[0][0], sizeof(glm::mat4));
 			api->render(renderable.mesh);
@@ -47,6 +40,6 @@ namespace Cala {
 
 	void SimpleRenderer::pushRenderable(const Renderable& renderable)
 	{
-		renderablesStack.push(&renderable);
+		renderablesStack.push(renderable);
 	}
 }

@@ -8,14 +8,14 @@ namespace Cala {
 	public:
 		SimpleRenderer();
 		~SimpleRenderer() override = default;
-		void render(const GraphicsAPI* api, const Camera& camera) override;
+		void render(GraphicsAPI* const, const Camera& camera) override;
 
 		struct Renderable {
 			Renderable(const Mesh& _mesh, const Transformation& _transformation, const glm::vec4 _color) :
 				mesh(_mesh), transformation(_transformation), color(_color) {}
 
 			const Mesh& mesh;
-			Transformation transformation;
+			const Transformation& transformation;
 			glm::vec4 color;
 		};
 
@@ -25,6 +25,6 @@ namespace Cala {
 		Shader shader;
 		ConstantBuffer mvpBuffer;
 		ConstantBuffer materialsBuffer;
-		std::stack<const Renderable*> renderablesStack;
+		std::stack<Renderable> renderablesStack;
 	};
 }

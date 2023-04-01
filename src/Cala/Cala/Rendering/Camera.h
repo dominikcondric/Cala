@@ -25,8 +25,6 @@ namespace Cala {
 		const glm::vec3& getWDirection() const { return wDirection; }
 		const glm::mat4& getView() const { return view; }
 		const glm::mat4& getProjection() const { return projection; }
-		bool viewChanged{ true };
-		bool projectionChanged{ true };
 
 	protected:
 		void recalculateEulerAngles();

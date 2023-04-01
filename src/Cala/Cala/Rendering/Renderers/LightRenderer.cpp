@@ -1,80 +1,37 @@
 #include "LightRenderer.h"
-#include "Cala/Utility/Core.h"
+#include <glad/glad.h>
+#include <iostream>
+#include <glm/gtx/string_cast.hpp>
+
+#define BIT(x) (1 << x)
+
+#define DIFFUSE_MAP_BINDING 0
+#define SPECULAR_MAP_BINDING 1
+#define NORMAL_MAP_BINDING 2
+#define SHADOW_MAP_BINDING 3
 
 namespace Cala {
 	LightRenderer::LightRenderer()
 	{
 		std::filesystem::path shadersDir(SHADERS_DIR);
-		shader.attachShader(Shader::ShaderType::VertexShader, shadersDir / "GeneralVertexShader.glsl");
-		shader.attachShader(Shader::ShaderType::FragmentShader, shadersDir / "LightFragmentShader.glsl");
-		shader.createProgram();
+		mainShader.attachShader(Shader::ShaderType::VertexShader, shadersDir / "GeneralVertexShader.glsl");
+		mainShader.attachShader(Shader::ShaderType::FragmentShader, shadersDir / "LightFragmentShader.glsl");
+		mainShader.createProgram();
 
-		mvpBuffer.setData(shader.getConstantBufferInfo("MVP"), true);
-		materialsBuffer.setData(shader.getConstantBufferInfo("MeshData"), true);
-		lightsBuffer.setData(shader.getConstantBufferInfo("LightsData"), true);
-	}
+		shadowPassShader.attachShader(Shader::ShaderType::VertexShader, shadersDir / "ShadowPassVertexShader.glsl");
+		shadowPassShader.attachShader(Shader::ShaderType::GeometryShader, shadersDir / "ShadowPassGeometryShader.glsl");
+		shadowPassShader.attachShader(Shader::ShaderType::FragmentShader, shadersDir / "ShadowPassFragmentShader.glsl");
+		shadowPassShader.createProgram();
 
-	void LightRenderer::render(const GraphicsAPI* api, const Camera& camera)
-	{
-		if (camera.viewChanged)
-		{
-			mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
-			mvpBuffer.updateData("eyePosition", &camera.getPosition().x, sizeof(glm::vec4));
-		}
+		mvpBuffer.setData(mainShader.getConstantBufferInfo("MVP"), true);
+		materialsBuffer.setData(mainShader.getConstantBufferInfo("MeshData"), true);
+		lightsBuffer.setData(mainShader.getConstantBufferInfo("LightsData"), true);
 
-		if (camera.projectionChanged)
-		{
-			mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
-		}
-
-		uint32_t lightsCount = (uint32_t)lightsStack.size();
-		materialsBuffer.updateData("lightSourceCount", &lightsCount, sizeof(uint32_t));
-		uint32_t lightCounter = 0;
-		while (!lightsStack.empty())
-		{
-			const Light& light = *lightsStack.top();
-			updateLight(light, lightCounter++);
-			lightsStack.pop();
-		}
-
-		shader.activate();
-		api->enableSetting(GraphicsAPI::FaceCulling);
-		api->enableSetting(GraphicsAPI::DepthTesting);
-		int lightened = 1;
-		materialsBuffer.updateData("lightened", &lightened, sizeof(int));
-
-		for (uint32_t state = 0; state < 8; ++state)
-		{
-			if (!renderables[state].empty())
-			{
-				materialsBuffer.updateData("state", &state, sizeof(int));
-			}
-
-			while (!renderables[state].empty())
-			{
-				const Renderable& renderable = *renderables[state].top();
-				if ((state & BIT(0)) != 0)
-					renderable.diffuseMap->setForSampling(0);
-
-				if ((state & BIT(1)) != 0)
-					renderable.specularMap->setForSampling(1);
-
-				if ((state & BIT(2)) != 0)
-					renderable.normalMap->setForSampling(2);
-
-				mvpBuffer.updateData("model", &renderable.transformation.getTransformMatrix()[0][0], sizeof(glm::mat4));
-				materialsBuffer.updateData("material.color", &renderable.color.x, sizeof(glm::vec4));
-				materialsBuffer.updateData("material.ambientCoefficient", &renderable.ambientCoefficient, sizeof(float));
-				materialsBuffer.updateData("material.diffuseCoefficient", &renderable.diffuseCoefficient, sizeof(float));
-				materialsBuffer.updateData("material.specularCoefficient", &renderable.specularCoefficient, sizeof(float));
-				materialsBuffer.updateData("material.shininess", &renderable.shininess, sizeof(float));
-				api->render(renderable.mesh);
-				renderables[state].pop();
-			}
-		}
-
-		api->disableSetting(GraphicsAPI::FaceCulling);
-		api->disableSetting(GraphicsAPI::DepthTesting);
+		TextureArray* depthTexture = new TextureArray;
+		Texture::Specification texSpec(800, 800, ITexture::Format::DEPTH32, Texture::Dimensionality::TwoDimensional);
+		depthTexture->generateTextureArray(texSpec, 0, MAX_LIGHTS_COUNT * 6); // MAX_LIGHTS * 6 faces of a cubemap in case of point lights
+		shadowsFramebuffer.addDepthTarget(depthTexture, true, 0);
+		shadowsFramebuffer.loadFramebuffer();
 	}
 
 	void LightRenderer::pushRenderable(const Renderable& renderable)
@@ -90,18 +47,23 @@ namespace Cala {
 		if (renderable.normalMap != nullptr)
 			state |= BIT(2);
 
-		renderables[state].push(&renderable);
+		renderables[state].push_back(renderable);
 	}
 
 	void LightRenderer::pushLight(const Light& light)
 	{
-		lightsStack.push(&light);
+		if (lights.size() < MAX_LIGHTS_COUNT)
+			lights.push_back(light);
 	}
 
-	void LightRenderer::updateLight(const Light& light, uint32_t lightIndex) const
+	void LightRenderer::updateLight(const Light& light, uint32_t lightIndex, GraphicsAPI* const api)
 	{
+		/** 
+		 * Setting up light uniforms
+		*/
 		glm::vec3 color, direction;
 		float constant, linear, quadratic, cutoff;
+		glm::mat4 projection;
 
 		switch (light.type)
 		{
@@ -112,30 +74,36 @@ namespace Cala {
 				constant = 1.1f;
 				linear = 0.024f;
 				quadratic = 0.0021f;
-				cutoff = -1.f;
+				cutoff = -2.f;
+				projection = glm::perspective(90.f, 1.f, 1.f, light.intensity * 100.f);
 				break;
 			}
 			case Light::Type::Directional:
 			{
-				color = glm::vec4(light.intensity * light.color, 1.f);
+				color = light.intensity * light.color;
 				direction = glm::vec3(0.f, -1.f, 0.f);
 				constant = 0.f;
 				linear = 0.f;
 				quadratic = 0.f;
-				cutoff = 1.1f;
+				cutoff = -3.f;
+				projection = glm::ortho(-20.f, 20.f, -20.f, 20.f, 1.f, 30.f);
 				break;
 			}
 			case Light::Type::Spotlight:
 			{
-				color = glm::vec4(light.intensity * light.color, 1.f);
+				color = light.intensity * light.color;
 				direction = glm::vec4(glm::vec3(light.transformation.getRotationMatrix() * glm::vec4(0.f, -1.f, 0.f, 0.f)), 0.f);
 				constant = 1.f;
 				linear = 0.045f;
 				quadratic = 0.0075f;
-				cutoff = glm::cos(light.spotlightCutoff);
+				cutoff = glm::cos(glm::radians(light.spotlightCutoff));
+				projection = glm::perspective(light.spotlightCutoff * 2.f, 1.f, 1.f, light.intensity * 100.f);
 				break;
 			}
 		}
+
+		if (!light.shadowCaster)
+			projection = glm::mat4(0.f);
 
 		std::string lightsString = "lights[" + std::to_string(lightIndex) + "].";
 		lightsBuffer.updateData(lightsString + "position", &light.transformation.getTranslation().x, sizeof(glm::vec4));
@@ -145,5 +113,104 @@ namespace Cala {
 		lightsBuffer.updateData(lightsString + "linear", &linear, sizeof(float));
 		lightsBuffer.updateData(lightsString + "quadratic", &quadratic, sizeof(float));
 		lightsBuffer.updateData(lightsString + "cutoff", &cutoff, sizeof(float));
+		lightsBuffer.updateData(lightsString + "projection", &projection[0][0], sizeof(glm::mat4));
 	}
+
+    void LightRenderer::render(GraphicsAPI* const api, const Camera &camera)
+    {
+		mvpBuffer.updateData("eyePosition", &camera.getPosition().x, sizeof(glm::vec4));
+
+		int shadowsInt = shadows;
+		lightsBuffer.updateData("shadows", &shadowsInt, sizeof(shadowsInt));
+
+		auto currentViewport = api->getCurrentViewport();
+
+		/**
+		 * Setting up shader for light setup
+		*/ 
+		const uint32_t lightsCount = (uint32_t)lights.size();
+		lightsBuffer.updateData("lightSourceCount", &lightsCount, sizeof(uint32_t));
+
+		for (uint32_t lightCounter = 0U; lightCounter < lights.size(); ++lightCounter)
+		{
+			updateLight(lights[lightCounter], lightCounter, api);
+		}
+		lights.clear();
+
+		/**
+		 * Rendering to shadow map
+		*/
+		const Framebuffer* activeFramebuffer = api->getActiveFramebuffer();
+		api->enableSetting(GraphicsAPI::DepthTesting);
+		if (shadows)
+		{
+			shadowPassShader.activate();
+			api->setBufferClearingBits(false, true, false);
+			api->activateFramebuffer(shadowsFramebuffer);
+			glm::ivec2 depthTextureSize = shadowsFramebuffer.getDepthTarget().getTextureDimensions();
+			api->setViewport({ 0, 0, depthTextureSize.x, depthTextureSize.y });
+			api->clearFramebuffer();
+			for (int state = 0; state < 8; state++)
+			{
+				for (const Renderable& renderable : renderables[state])
+				{
+					mvpBuffer.updateData("model", &renderable.transformation.getTransformMatrix()[0][0], sizeof(glm::mat4));
+					api->render(renderable.mesh);
+				}
+			}
+
+			shadowsFramebuffer.getDepthTarget().setForSampling(SHADOW_MAP_BINDING);
+		}
+
+		/**
+		 * Setting up uniforms for normal rendering
+		*/
+		mainShader.activate();
+		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
+		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
+
+		if (activeFramebuffer != nullptr)
+			api->activateFramebuffer(*activeFramebuffer);
+		else
+			api->activateDefaultFramebuffer();
+			
+		api->setViewport(currentViewport);
+		api->setBufferClearingBits(true, true, true);
+		api->enableSetting(GraphicsAPI::FaceCulling);
+		int lightened = 1;
+		materialsBuffer.updateData("lightened", &lightened, sizeof(int));
+
+		for (uint32_t state = 0; state < 8; ++state)
+		{
+			if (!renderables[state].empty())
+			{
+				materialsBuffer.updateData("state", &state, sizeof(int));
+			}
+
+			for (const Renderable& renderable : renderables[state])
+			{
+				if ((state & BIT(DIFFUSE_MAP_BINDING)) != 0)
+					renderable.diffuseMap->setForSampling(DIFFUSE_MAP_BINDING);
+
+				if ((state & BIT(SPECULAR_MAP_BINDING)) != 0)
+					renderable.specularMap->setForSampling(SPECULAR_MAP_BINDING);
+
+				if ((state & BIT(NORMAL_MAP_BINDING)) != 0)
+					renderable.normalMap->setForSampling(NORMAL_MAP_BINDING);
+
+				mvpBuffer.updateData("model", &renderable.transformation.getTransformMatrix()[0][0], sizeof(glm::mat4));
+				materialsBuffer.updateData("material.color", &renderable.color.x, sizeof(glm::vec4));
+				materialsBuffer.updateData("material.ambientCoefficient", &renderable.ambientCoefficient, sizeof(float));
+				materialsBuffer.updateData("material.diffuseCoefficient", &renderable.diffuseCoefficient, sizeof(float));
+				materialsBuffer.updateData("material.specularCoefficient", &renderable.specularCoefficient, sizeof(float));
+				materialsBuffer.updateData("material.shininess", &renderable.shininess, sizeof(float));
+				api->render(renderable.mesh);
+			}
+
+			renderables[state].clear();
+		}
+
+		api->disableSetting(GraphicsAPI::FaceCulling);
+		api->disableSetting(GraphicsAPI::DepthTesting);
+    }
 }

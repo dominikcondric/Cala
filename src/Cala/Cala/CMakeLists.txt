@@ -5,14 +5,17 @@ set(src_files
     Rendering/Mesh.h                Rendering/Mesh.cpp
     Rendering/GraphicsAPI.h         Rendering/GraphicsAPI.cpp
     Rendering/Shader.h              Rendering/Shader.cpp
+    Rendering/ITexture.h            Rendering/ITexture.cpp
     Rendering/Texture.h             Rendering/Texture.cpp
+    Rendering/TextureArray.h             Rendering/TextureArray.cpp
+    Rendering/NativeAPI.h
     
     Rendering/Renderers/IRenderer.h
     Rendering/Renderers/LightRenderer.h         Rendering/Renderers/LightRenderer.cpp 
     Rendering/Renderers/SkyboxRenderer.h        Rendering/Renderers/SkyboxRenderer.cpp 
     Rendering/Renderers/SimpleRenderer.h   Rendering/Renderers/SimpleRenderer.cpp 
     Rendering/Renderers/HelperGridRenderer.h    Rendering/Renderers/HelperGridRenderer.cpp 
-    Rendering/Renderers/PostProcessor.h         Rendering/Renderers/PostProcessor.cpp 
+    Rendering/Renderers/PostProcessingRenderer.h         Rendering/Renderers/PostProcessingRenderer.cpp 
 
     Utility/Image.h                 Utility/Image.cpp
     Utility/Time.h                 Utility/Time.cpp
@@ -21,17 +24,18 @@ set(src_files
     Utility/IOSystem.h              Utility/IOSystem.cpp
     Utility/Transformation.h        Utility/Transformation.cpp
     Utility/BaseApplication.h        Utility/BaseApplication.cpp
-    Utility/Core.h                    Utility/Core.cpp
+    Utility/Logger.h                Utility/Logger.cpp
+    Utility/Platform.h
 
-    Rendering/Shaders/HelperGridFragmentShader.glsl
-    Rendering/Shaders/HelperGridGeometryShader.glsl
-    Rendering/Shaders/HelperGridVertexShader.glsl
-    Rendering/Shaders/GeneralVertexShader.glsl
-    Rendering/Shaders/LightFragmentShader.glsl
-    Rendering/Shaders/PostProcessingVertexShader.glsl
-    Rendering/Shaders/PostProcessingFragmentShader.glsl
-    Rendering/Shaders/SkyboxVertexShader.glsl
-    Rendering/Shaders/SkyboxFragmentShader.glsl
+    // Rendering/Shaders/HelperGridFragmentShader.glsl
+    // Rendering/Shaders/HelperGridGeometryShader.glsl
+    // Rendering/Shaders/HelperGridVertexShader.glsl
+    // Rendering/Shaders/GeneralVertexShader.glsl
+    // Rendering/Shaders/LightFragmentShader.glsl
+    // Rendering/Shaders/PostProcessingVertexShader.glsl
+    // Rendering/Shaders/PostProcessingFragmentShader.glsl
+    // Rendering/Shaders/SkyboxVertexShader.glsl
+    // Rendering/Shaders/SkyboxFragmentShader.glsl
 )
 
 # Cala library
@@ -39,7 +43,11 @@ add_library(Cala STATIC
     ${src_files}
 )
 
-target_compile_definitions(Cala PUBLIC SHADERS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Rendering/Shaders/")
+target_compile_definitions(Cala 
+    PUBLIC 
+        SHADERS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/Rendering/Shaders/"
+        CALA_API_OPENGL
+)
 
 target_compile_features(Cala PUBLIC cxx_std_17)
 

@@ -24,6 +24,8 @@ cd build
 cmake ..
 ```
 
+In case you don't want to build demo, set *BUILD_DEMO* option to *OFF*.
+
 *\* If you want to use different build system than the one chosen by CMake, use -G flag with build system in quotes (You can find the list of supported build systems using cmake --help).*
 
 ---
@@ -34,8 +36,10 @@ Primarily for learning purposes. At least it started like that. Current idea is 
 
 ### What are the main features of Cala?
 Some of the things Cala can do are:
-* Basic 3D rendering of arbitrary meshes, both single-colored or textured(diffuse, specular)
-* Basic lighting
+* Basic 3D rendering of arbitrary meshes, both single-colored or textured
+* Normal mapping
+* Blinn-Phong lighting model with multiple lights of different kind (directional, point, spotlights)
+* Dynamic shadows
 * Basic post processing (blurs, bloom, negative, hdr)
 
 ### Which graphics APIs Cala supports?

@@ -27,7 +27,6 @@ namespace Cala {
 		}
 
 		view = glm::lookAt(position, center, lookUp);
-		viewChanged = true;
 	}
 
 	void Camera::setPosition(const glm::vec3& newPosition)
@@ -35,7 +34,6 @@ namespace Cala {
 		position = newPosition;
 		center = position + wDirection;
 		view = glm::lookAt(position, center, lookUp);
-		viewChanged = true;
 	}
 
 	void Camera::setCenter(const glm::vec3& newCenter)
@@ -85,7 +83,6 @@ namespace Cala {
 		vDirection = glm::cross(uDirection, wDirection);
 
 		view = glm::lookAt(position, center, lookUp);
-		viewChanged = true;
 	}
 
 	void Camera::setMouseSensitivity(float sensitivity)
@@ -136,7 +133,6 @@ namespace Cala {
 		}
 
 		view = glm::lookAt(position, center, lookUp);
-		viewChanged = true;
 	}
 
 	PerspectiveCamera::PerspectiveCamera()
@@ -159,7 +155,6 @@ namespace Cala {
 	void PerspectiveCamera::project()
 	{
 		projection = glm::perspective(glm::radians(viewingAngle), aspectRatio, nearPlane, farPlane);
-		projectionChanged = true;
 	}
 
 	OrthograficCamera::OrthograficCamera()
@@ -194,6 +189,5 @@ namespace Cala {
 	void OrthograficCamera::project()
 	{
 		projection = glm::ortho(leftPlane, rightPlane, nearPlane, farPlane);
-		projectionChanged = true;
 	}
 }

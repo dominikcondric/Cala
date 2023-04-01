@@ -1,6 +1,6 @@
 #include "BaseApplication.h"
 
-#define MOVE_SPEED 5.f * time.deltaTime
+#define MOVE_SPEED 5.f * time.getDeltaTime()
 
 namespace Cala {
 
@@ -62,7 +62,7 @@ namespace Cala {
 			camera.setProjectionAspectRatio((float)winSize.x / winSize.y);
 		}
 
-		while (time.frameRate > fpsLock) {
+		while (time.getFrameRate() > fpsLock) {
 			time.incrementalUpdate();
 		}
 	}
