@@ -23,7 +23,7 @@ layout (binding = 4) uniform LightsData
 	bool shadows;
 };
 
-mat4 calculateLightViewMatrix(inout Light light, inout vec3 direction)
+mat4 calculateLightViewMatrix(const Light light, const vec3 direction)
 {
 	vec3 up = normalize(vec3(0.4f, 0.1235f, 1.235f)); // Initialize up to random normalized vector not parallel to direction
 	vec3 right = normalize(cross(up, direction)); // Get first perpendicular vector from random up and direction
@@ -43,7 +43,7 @@ mat4 calculateLightViewMatrix(inout Light light, inout vec3 direction)
 	return view;
 }
 
-void generatePointShadowMaps(inout Light light)
+void generatePointShadowMaps(const Light light)
 {
 	vec3 directions[6] = vec3[](
 		vec3(1.f, 0.f, 0.f),  // +X
@@ -67,7 +67,7 @@ void generatePointShadowMaps(inout Light light)
 	}
 }
 
-void generateDirectionalSpotlightShadowMaps(inout Light light)
+void generateDirectionalSpotlightShadowMaps(const Light light)
 {
 	mat4 view = calculateLightViewMatrix(light, light.direction);
 	for (int vertex = 0; vertex < 3; ++vertex)

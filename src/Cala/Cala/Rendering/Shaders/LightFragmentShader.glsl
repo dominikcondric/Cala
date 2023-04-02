@@ -64,29 +64,29 @@ out vec4 outColor;
 vec3 normal;
 vec3 lightViewPosition;
 
-float attenuation(inout Light light) 
+float attenuation(const Light light) 
 {
 	float distance = length(light.position - inAttributes.fragPosition);
 	float attenuation = 1.0 / (light.constant + light.linear * distance * light.quadratic * distance * distance);
 	return attenuation;
 }
 
-bool isPoint(inout Light light)
+bool isPoint(const Light light)
 {
 	return light.cutoff < 1.5f;
 }
 
-bool isDirectional(inout Light light)
+bool isDirectional(const Light light)
 {
 	return light.constant < 0.9f;
 }
 
-bool isSpotlight(inout Light light)
+bool isSpotlight(const Light light)
 {
 	return !isPoint(light) && !isDirectional(light);
 }
 
-mat4 calculateLightViewMatrix(inout Light light, inout vec3 direction)
+mat4 calculateLightViewMatrix(const Light light, const vec3 direction)
 {
 	vec3 up = normalize(vec3(0.4f, 0.1235f, 1.235f)); // Initialize up to random normalized vector not parallel to direction
 	vec3 right = normalize(cross(up, direction)); // Get first perpendicular vector from random up and direction
@@ -106,7 +106,7 @@ mat4 calculateLightViewMatrix(inout Light light, inout vec3 direction)
 	return view;
 }
 
-float shadowFactor(inout Light light, out uint shadowMapCounter)
+float shadowFactor(const Light light, out uint shadowMapCounter)
 {
 	if (!shadows || light.projection == mat4(0.f))
 		return 0.f;
@@ -189,7 +189,7 @@ float shadowFactor(inout Light light, out uint shadowMapCounter)
     return shadow;
 }  
 
-vec3 calculatePointLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout vec3 colorSpecular, inout vec3 eyeDirection, inout Light light, out uint shadowMapCounter) 
+vec3 calculatePointLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout vec3 colorSpecular, inout vec3 eyeDirection, const Light light, out uint shadowMapCounter) 
 {
 	// ambient
 	vec3 ambientComponent = colorAmbient; 
@@ -211,7 +211,7 @@ vec3 calculatePointLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout
 }
 
 
-vec3 calculateDirectionalLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout vec3 colorSpecular, inout vec3 eyeDirection, inout Light light, out uint shadowMapCounter)
+vec3 calculateDirectionalLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout vec3 colorSpecular, inout vec3 eyeDirection, const Light light, out uint shadowMapCounter)
 {
 	// ambient
 	vec3 ambientComponent = colorAmbient;
@@ -234,7 +234,7 @@ vec3 calculateDirectionalLight(inout vec3 colorAmbient, inout vec3 colorDiffuse,
 }
 
 
-vec3 calculateSpotlightLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout vec3 colorSpecular, inout vec3 eyeDirection, inout Light light, out uint shadowMapCounter)
+vec3 calculateSpotlightLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout vec3 colorSpecular, inout vec3 eyeDirection, const Light light, out uint shadowMapCounter)
 {
 	// ambient
 	vec3 ambientComponent = colorAmbient; 
@@ -313,7 +313,7 @@ void main()
 	for (uint lightCounter = 0; lightCounter < lightSourceCount; ++lightCounter)
 	{
 		vec3 eyeDirection = normalize(eyePosition - inAttributes.fragPosition);
-		Light light = lights[lightCounter];
+		const Light light = lights[lightCounter];
 		if (isDirectional(light)) 
 		{
 			color.rgb += calculateDirectionalLight(colorAmbient, colorDiffuse, colorSpecular, eyeDirection, light, shadowMapCounter);

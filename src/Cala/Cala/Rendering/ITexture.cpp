@@ -139,7 +139,7 @@ namespace Cala {
         if (dimensionality == Dimensionality::ThreeDimensional || dimensionality == Dimensionality::Cubemap) 
             glTexParameteri(nativeTextureType, GL_TEXTURE_WRAP_R, translateMethod(specification.renderingStyle.rDimensionWrap));
 
-        if (isDepth() || isDepthStencil())
+        if (!isColor())
         {
             glTexParameteri(nativeTextureType, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
             glTexParameteri(nativeTextureType, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
