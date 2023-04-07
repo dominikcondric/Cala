@@ -5,7 +5,8 @@
 namespace Cala {
 
 	BaseApplication::BaseApplication(const Window::Specification& windowSpecification) : 
-		window(Window::construct(windowSpecification)), api(GraphicsAPI::construct())
+		window(Window::construct(windowSpecification)), api(GraphicsAPI::construct()),
+		camera(Camera::Type::Perspective)
 	{
 		camera.setProjectionAspectRatio((float)windowSpecification.width / windowSpecification.height);
 

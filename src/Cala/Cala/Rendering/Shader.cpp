@@ -19,8 +19,10 @@ namespace Cala {
 
 	Shader& Shader::operator=(Shader&& other) noexcept
 	{
-		memcpy(this, &other, sizeof(Shader));
+		programHandle = other.programHandle;
 		other.programHandle = GL_NONE;
+		attachedShaders = other.attachedShaders;
+		shaderHandlesBuffer = other.shaderHandlesBuffer;
 		return *this;
 	}
 
@@ -143,7 +145,7 @@ namespace Cala {
 		if (programHandle == GL_NONE)
 			return;
 
-		int blockIndex = glGetUniformBlockIndex(programHandle, bufferName.c_str());
+		uint32_t blockIndex = glGetUniformBlockIndex(programHandle, bufferName.c_str());
 
 		if (blockIndex == GL_INVALID_INDEX)
 		{

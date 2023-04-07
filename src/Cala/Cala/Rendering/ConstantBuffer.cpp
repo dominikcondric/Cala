@@ -24,6 +24,7 @@ namespace Cala {
 		other.bindingPointsCache = bindingPointsCache;
 		other.errorOccured = errorOccured;
 		other.specification = specification;
+		bufferHandle = other.bufferHandle;
 		other.bufferHandle = GL_NONE;
 		return *this;
 	}

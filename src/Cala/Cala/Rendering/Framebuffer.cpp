@@ -23,6 +23,7 @@ namespace Cala {
 	{
 		other.colorTargets = std::move(colorTargets);
 		other.depthTarget = std::move(depthTarget);
+		framebufferHandle = other.framebufferHandle;
 		other.framebufferHandle = GL_NONE;
 		return *this;
 	}

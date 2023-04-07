@@ -14,7 +14,7 @@ namespace Cala {
 	protected:
 		std::unique_ptr<Window> window;
 		std::unique_ptr<GraphicsAPI> api;
-		PerspectiveCamera camera;
+		Camera camera;
 		Time time;
 
 		void setFpsLock(float fps);

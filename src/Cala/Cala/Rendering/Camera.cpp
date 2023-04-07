@@ -6,8 +6,9 @@
 #define FULL_CIRCLE (2 * glm::pi<float>())
 
 namespace Cala {
-	Camera::Camera()
+	Camera::Camera(Type _type)
 	{
+		setType(_type);
 		recalculateEulerAngles();
 	}
 
@@ -29,8 +30,8 @@ namespace Cala {
 		view = glm::lookAt(position, center, lookUp);
 	}
 
-	void Camera::setPosition(const glm::vec3& newPosition)
-	{
+    void Camera::setPosition(const glm::vec3 &newPosition)
+    {
 		position = newPosition;
 		center = position + wDirection;
 		view = glm::lookAt(position, center, lookUp);
@@ -51,13 +52,27 @@ namespace Cala {
 	void Camera::setProjectionNearPlane(float near)
 	{
 		nearPlane = near;
-		project();
+		perspectiveProject();
+		orthographicProject();
 	}
 
 	void Camera::setProjectionFarPlane(float far)
 	{
 		farPlane = far;
-		project();
+		perspectiveProject();
+		orthographicProject();
+	}
+
+    void Camera::setProjectionViewingAngle(float angle)
+	{
+		viewingAngle = angle;
+		perspectiveProject();
+	}
+
+	void Camera::setProjectionAspectRatio(float ratio)
+	{
+		aspectRatio = ratio;
+		perspectiveProject();
 	}
 
 	void Camera::rotateCamera(const glm::vec2& offset)
@@ -135,59 +150,36 @@ namespace Cala {
 		view = glm::lookAt(position, center, lookUp);
 	}
 
-	PerspectiveCamera::PerspectiveCamera()
+    void Camera::setType(Type _type)
+    {
+		type = _type;
+		switch (type)
+		{
+			case Type::Orthographic:
+				currentProjection = &orthographicProjection;
+				break;
+			case Type::Perspective:
+				currentProjection = &perspectiveProjection;
+				break;
+		};
+    }
+
+    void Camera::perspectiveProject()
 	{
-		project();
+		perspectiveProjection = glm::perspective(glm::radians(viewingAngle), aspectRatio, nearPlane, farPlane);
 	}
 
-	void PerspectiveCamera::setProjectionViewingAngle(float angle)
+	void Camera::orthographicProject()
 	{
-		viewingAngle = angle;
-		project();
+		orthographicProjection = glm::ortho(leftPlane, rightPlane, nearPlane, farPlane);
 	}
 
-	void PerspectiveCamera::setProjectionAspectRatio(float ratio)
-	{
-		aspectRatio = ratio;
-		project();
-	}
-
-	void PerspectiveCamera::project()
-	{
-		projection = glm::perspective(glm::radians(viewingAngle), aspectRatio, nearPlane, farPlane);
-	}
-
-	OrthograficCamera::OrthograficCamera()
-	{
-		project();
-	}
-
-	void OrthograficCamera::setProjectionLeftPlane(float left)
-	{
+    void Camera::setProjectionPlanes(float left, float right, float top, float bottom)
+    {
 		leftPlane = left;
-		project();
-	}
-
-	void OrthograficCamera::setProjectionRightPlane(float right)
-	{
 		rightPlane = right;
-		project();
-	}
-
-	void OrthograficCamera::setProjectionTopPlane(float top)
-	{
 		topPlane = top;
-		project();
-	}
-
-	void OrthograficCamera::setProjectionBottomPlane(float bottom)
-	{
 		bottomPlane = bottom;
-		project();
-	}
-
-	void OrthograficCamera::project()
-	{
-		projection = glm::ortho(leftPlane, rightPlane, nearPlane, farPlane);
-	}
+		orthographicProject();
+    }
 }
