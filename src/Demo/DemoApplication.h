@@ -18,8 +18,7 @@ private:
 	std::array<Transformation, 4> wallTransforms;
 	SimpleRenderer simpleRenderer;
 	LightRenderer lightRenderer;
-	// std::vector<Texture> diffuseMaps, normalMaps;
-	std::vector<LightRenderer::Renderable> renderables;
+	std::vector<LightRenderer::Renderable> cubeRenderables;
 	std::vector<Transformation> transformations;
 	Transformation lightTransformation;
 };

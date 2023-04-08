@@ -11,7 +11,7 @@ namespace Cala {
 
 		mvpBuffer.setData(shader.getConstantBufferInfo("MVP"), true);
 
-		gridMesh.loadMesh(Model().loadRay(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), 2.f), false);
+		gridMesh.loadFromModel(Model().loadRay(glm::vec3(0.f, 0.f, 1.f), glm::vec3(0.f, 0.f, -1.f), 2.f), false);
 
 		transformation.scale(glm::vec3((float)gridSize));
 	}

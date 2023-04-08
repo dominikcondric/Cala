@@ -64,7 +64,7 @@ namespace Cala {
 		ITexture& operator=(const ITexture& other) = delete;
 		ITexture& operator=(ITexture&& other) noexcept;
         // virtual void attachToFramebuffer(Framebuffer& framebuffer) = 0;
-		glm::ivec2 getTextureDimensions() const { return glm::ivec2(width, height); }
+		glm::ivec2 getDimensions() const { return glm::ivec2(width, height); }
 		void setForSampling(uint32_t bindingIndex) const;
 		bool isWriteOnly() const { return writeOnly; }
 		bool isDepth() const;
@@ -73,8 +73,8 @@ namespace Cala {
 		Dimensionality getDimensionality() const { return dimensionality; }
 
 	protected:
-		void initializeTextureData(const Specification& specification);
-		void setTextureParameters(const Specification& specification) const;
+		void initializeData(const Specification& specification);
+		void setParameters(const Specification& specification) const;
         int width = 0;
         int height = 0;
 		bool writeOnly = false;
@@ -84,12 +84,12 @@ namespace Cala {
 	#ifdef CALA_API_OPENGL
 	protected: 
         GLuint textureHandle = API_NULL;
-        GLenum nativeTextureType;
-		GLenum internalTextureFormat;
-		GLenum textureFormat;
+        GLenum nativeType;
+		GLenum internalFormat;
+		GLenum format;
 		GLenum dataType;
 	public:
-        GLuint getNativeTextureHandle() const { return textureHandle; }
+        GLuint getNativeHandle() const { return textureHandle; }
 	#endif
     }; 
 }

@@ -7,9 +7,13 @@ namespace Cala {
 	class Image {
 	public:
 		Image() = default;
-		Image(const std::filesystem::path& path);
+		Image(const std::filesystem::path& pathToImage);
+		Image(const Image&) = delete;
+		Image(Image&& other);
+		Image& operator=(const Image&) = delete;
+		Image& operator=(Image&& other);
 		~Image();
-		void loadImage(const std::filesystem::path& path);
+		void load(const std::filesystem::path& pathToImage);
 		void freeData();
 		glm::ivec2 getDimensions() const { return glm::ivec2(width, height); }
 		int getChannelCount() const { return channelCount; }

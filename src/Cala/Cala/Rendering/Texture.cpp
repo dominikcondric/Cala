@@ -37,7 +37,7 @@ namespace Cala {
         for (uint32_t i = 0; i < 6; ++i)
             texData[i] = images[i].getData();
 
-        generateTexture(spec, texData);
+        load(spec, texData);
     }
 
     void Texture::load2DTextureFromImage(const Image& image, const RenderingStyle& renderingStyle)
@@ -45,22 +45,22 @@ namespace Cala {
         bool alpha = image.getChannelCount() == 4 ? true : false;
         Specification spec(image.getDimensions().x, image.getDimensions().y,  alpha ? Format::RGBA : Format::RGB, Dimensionality::TwoDimensional);
         spec.renderingStyle = renderingStyle;
-        generateTexture(spec, (void*)image.getData());
+        load(spec, (void*)image.getData());
     }
 
-    void Texture::generateTexture(const Specification& specification, void* data)
+    void Texture::load(const Specification& specification, void* data)
     {
-        initializeTextureData(specification);
+        initializeData(specification);
 
         if (writeOnly)
         {
             if (textureHandle == GL_NONE)
                 glGenRenderbuffers(1, &textureHandle);
             
-            nativeTextureType = GL_RENDERBUFFER;
-            glBindRenderbuffer(nativeTextureType, textureHandle);
-		    glRenderbufferStorage(nativeTextureType, internalTextureFormat, width, height);
-            glBindRenderbuffer(nativeTextureType, GL_NONE);
+            nativeType = GL_RENDERBUFFER;
+            glBindRenderbuffer(nativeType, textureHandle);
+		    glRenderbufferStorage(nativeType, format, width, height);
+            glBindRenderbuffer(nativeType, GL_NONE);
         }
         else 
         {
@@ -75,10 +75,10 @@ namespace Cala {
 
                 case Dimensionality::TwoDimensional:
                 {
-                    nativeTextureType = GL_TEXTURE_2D;
-                    glBindTexture(nativeTextureType, textureHandle);
-                    glTexImage2D(nativeTextureType, 0, internalTextureFormat, width, height, 0, textureFormat, dataType, data);
-                    setTextureParameters(specification);
+                    nativeType = GL_TEXTURE_2D;
+                    glBindTexture(nativeType, textureHandle);
+                    glTexImage2D(nativeType, 0, internalFormat, width, height, 0, format, dataType, data);
+                    setParameters(specification);
                     break;
                 }
 
@@ -88,18 +88,18 @@ namespace Cala {
 
                 case Dimensionality::Cubemap:
                 {
-                    nativeTextureType = GL_TEXTURE_CUBE_MAP;
-                    glBindTexture(nativeTextureType, textureHandle);
+                    nativeType = GL_TEXTURE_CUBE_MAP;
+                    glBindTexture(nativeType, textureHandle);
                     const void** texData = reinterpret_cast<const void**>(data);
                     for (int i = 0; i < 6; i++)
-                        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalTextureFormat, width, height, 0, textureFormat, dataType, texData[i]);
+                        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, internalFormat, width, height, 0, format, dataType, texData[i]);
 
-                    setTextureParameters(specification);
+                    setParameters(specification);
                     break;
                 }
             }
 
-            glBindTexture(nativeTextureType, GL_NONE);
+            glBindTexture(nativeType, GL_NONE);
         }
     }
 

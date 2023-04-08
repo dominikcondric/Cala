@@ -27,11 +27,15 @@ namespace Cala {
 		materialsBuffer.setData(mainShader.getConstantBufferInfo("MeshData"), true);
 		lightsBuffer.setData(mainShader.getConstantBufferInfo("LightsData"), true);
 
-		TextureArray* depthTexture = new TextureArray;
-		Texture::Specification texSpec(800, 800, ITexture::Format::DEPTH32, Texture::Dimensionality::TwoDimensional);
-		depthTexture->generateTextureArray(texSpec, 0, MAX_LIGHTS_COUNT * 6); // MAX_LIGHTS * 6 faces of a cubemap in case of point lights
-		shadowsFramebuffer.addDepthTarget(depthTexture, true, 0);
-		shadowsFramebuffer.loadFramebuffer();
+		TextureArray* depthTextureArray = new TextureArray;
+		Texture::Specification depthTextureSpecification(
+			800, 800, ITexture::Format::DEPTH32, 
+			Texture::Dimensionality::TwoDimensional
+		);
+
+		depthTextureArray->load(depthTextureSpecification, 0, MAX_LIGHTS_COUNT * 6); // MAX_LIGHTS * 6 faces of a cubemap in case of point lights
+		shadowsFramebuffer.addDepthTarget(depthTextureArray, true, 0);
+		shadowsFramebuffer.load();
 	}
 
 	void LightRenderer::pushRenderable(const Renderable& renderable)
@@ -147,7 +151,7 @@ namespace Cala {
 			shadowPassShader.activate();
 			api->setBufferClearingBits(false, true, false);
 			api->activateFramebuffer(shadowsFramebuffer);
-			glm::ivec2 depthTextureSize = shadowsFramebuffer.getDepthTarget().getTextureDimensions();
+			glm::ivec2 depthTextureSize = shadowsFramebuffer.getDepthTarget().getDimensions();
 			api->setViewport({ 0, 0, depthTextureSize.x, depthTextureSize.y });
 			api->clearFramebuffer();
 			for (int state = 0; state < 8; state++)
@@ -176,7 +180,6 @@ namespace Cala {
 			
 		api->setViewport(currentViewport);
 		api->setBufferClearingBits(true, true, true);
-		api->enableSetting(GraphicsAPI::FaceCulling);
 		int lightened = 1;
 		materialsBuffer.updateData("lightened", &lightened, sizeof(int));
 
@@ -210,7 +213,6 @@ namespace Cala {
 			renderables[state].clear();
 		}
 
-		api->disableSetting(GraphicsAPI::FaceCulling);
 		api->disableSetting(GraphicsAPI::DepthTesting);
     }
 }

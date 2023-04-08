@@ -21,9 +21,9 @@ namespace Cala {
 
 	ConstantBuffer& ConstantBuffer::operator=(ConstantBuffer&& other) noexcept
 	{
-		other.bindingPointsCache = bindingPointsCache;
-		other.errorOccured = errorOccured;
-		other.specification = specification;
+		bindingPointsCache = other.bindingPointsCache;
+		errorOccured = other.errorOccured;
+		specification = other.specification;
 		bufferHandle = other.bufferHandle;
 		other.bufferHandle = GL_NONE;
 		return *this;

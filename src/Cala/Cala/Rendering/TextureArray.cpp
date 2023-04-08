@@ -6,21 +6,22 @@ namespace Cala {
 #include <glad/glad.h>
     TextureArray::TextureArray(const std::vector<Image> &images, const RenderingStyle& renderingStyle, uint32_t _mipmapCount)
     {
-        loadTextureFromImages(images, renderingStyle, _mipmapCount);
+        loadFromImages(images, renderingStyle, _mipmapCount);
     }
 
-    void TextureArray::loadTextureFromImages(const std::vector<Image> &images, const RenderingStyle& renderingStyle, uint32_t _mipmapCount)
+    void TextureArray::loadFromImages(const std::vector<Image> &images, const RenderingStyle& renderingStyle, uint32_t _mipmapCount)
     {
         Specification spec(images[0].getDimensions().x, images[0].getDimensions().y, 
             (images[0].getChannelCount() == 4) ? Format::RGBA : Format::RGB, Dimensionality::TwoDimensional);
         spec.writeOnly = false;
         spec.renderingStyle = renderingStyle;
-        generateTextureArray(spec, _mipmapCount, images.size());
+        load(spec, _mipmapCount, (uint32_t)images.size());
     }
 
-    void TextureArray::generateTextureArray(const Specification &specification, uint32_t _mipmapCount, uint32_t _layerCount)
+    void TextureArray::load(const Specification &specification, uint32_t _mipmapCount, uint32_t _layerCount)
     {
-        initializeTextureData(specification);
+        initializeData(specification);
+
         if (_mipmapCount == 0)
             _mipmapCount = 1;
         mipmapCount = _mipmapCount;
@@ -36,10 +37,10 @@ namespace Cala {
                 break;
 
             case Dimensionality::TwoDimensional:
-                nativeTextureType = GL_TEXTURE_2D_ARRAY;
-                glBindTexture(nativeTextureType, textureHandle);
-                glTexStorage3D(nativeTextureType, mipmapCount, internalTextureFormat, width, height, layerCount);
-                setTextureParameters(specification);
+                nativeType = GL_TEXTURE_2D_ARRAY;
+                glBindTexture(nativeType, textureHandle);
+                glTexStorage3D(nativeType, mipmapCount, internalFormat, width, height, layerCount);
+                setParameters(specification);
                 break;
 
             case Dimensionality::ThreeDimensional:
@@ -51,7 +52,7 @@ namespace Cala {
                 break;
         }
 
-        glBindTexture(nativeTextureType, GL_NONE);
+        glBindTexture(nativeType, GL_NONE);
     }
 #endif
 }

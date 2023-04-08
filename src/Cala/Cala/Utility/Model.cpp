@@ -386,8 +386,8 @@ namespace Cala {
 			auto mapIterator = vertexMap.find(glm::to_string(vertex));
 			if (mapIterator == vertexMap.end())
 			{
-				oldToNewIndexMapping[i] = vertexMap.size();							    // Map old vertex to new vertex index
-				vertexMap.insert({ glm::to_string(vertex), vertexMap.size() });			// Add unique vertex
+				oldToNewIndexMapping[i] = (uint32_t)vertexMap.size();							    // Map old vertex to new vertex index
+				vertexMap.insert({ glm::to_string(vertex), (uint32_t)vertexMap.size() });			// Add unique vertex
 				for (int j = 0; j < 8; ++j)
 					newVertices.push_back(vertexData[i * 8 + j]);						// Add vertex to new vertex array
 			}
@@ -404,7 +404,7 @@ namespace Cala {
 		}
 
 		vertexData = newVertices;
-		vertexCount = newVertices.size() / 8;
+		vertexCount = (uint32_t)newVertices.size() / 8;
 		indexData = newIndices;
 	}
 }

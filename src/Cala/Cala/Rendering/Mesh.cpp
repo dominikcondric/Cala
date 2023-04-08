@@ -7,7 +7,7 @@ namespace Cala {
 #ifdef CALA_API_OPENGL
 	Mesh::Mesh(const Model& model, bool dynamic)
 	{
-		loadMesh(model, dynamic);
+		loadFromModel(model, dynamic);
 	}
 
 	Mesh::~Mesh()
@@ -36,7 +36,7 @@ namespace Cala {
 		return *this;
 	}
 
-	void Mesh::loadMesh(const Model& model, bool dynamic)
+	void Mesh::loadFromModel(const Model& model, bool dynamic)
 	{
 		setVertexBufferData(model.getVertexData(), model.getVertexCount(), model.getLayoutSpecification(), dynamic);
 		if (model.getIndexCount() != 0)

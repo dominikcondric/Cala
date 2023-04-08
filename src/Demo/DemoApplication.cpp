@@ -9,18 +9,16 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(M
 	camera.setProjectionViewingAngle(90.f);
 	camera.setProjectionFarPlane(100.f);
 
-	std::filesystem::path texturesDirectory = std::filesystem::path(__FILE__).parent_path();
-
-	// Reserves are VERY important for memory consistency (pointers!!!)
+	// Reserves are VERY important for memory consistency (references!!!)
 	transformations.reserve(100);
-	renderables.reserve(100);
+	cubeRenderables.reserve(100);
 	for (int i = 0; i < 100; ++i) {
 		Transformation transformation;
 		glm::vec2 diskRand = glm::diskRand(20.f);
 		transformation.scale(glm::linearRand(0.5f, 2.f)).translate(glm::vec3(diskRand.x, glm::linearRand(4.f, 8.f), diskRand.y));
 		transformations.push_back(transformation);
 
-		renderables.push_back(LightRenderer::Renderable(
+		cubeRenderables.push_back(LightRenderer::Renderable(
 			cubeMesh, transformations.back(), glm::vec4((glm::ballRand(1.f) + 1.f) * 0.5f, 1.f),
 			nullptr, nullptr, nullptr, 0.05f, 0.3f, 0.8f, 40.f
 		));
@@ -32,11 +30,12 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(M
 	wallTransforms[2].translate(glm::vec3(-20.f, 10.f, 0.f)).scale(glm::vec3(40.f, 20.f, 0.5f)).rotate(90.f, glm::vec3(0.f, 1.f, 0.f)); // Left wall
 
 	planeTransform.scale(40.f);
+	planeMesh.culled = false;
 
 	glm::vec2 rand = glm::diskRand(10.f);
 	lightTransformation.translate(glm::vec3(rand.x, 7.f, rand.y)).scale(0.2f);
 
-	api->setBufferClearingColor(glm::vec4(0.f));
+	api->setBufferClearingColor(glm::vec4(glm::vec3(0.1f), 1.f));
 }
 
 void DemoApplication::loop()
@@ -66,11 +65,11 @@ void DemoApplication::loop()
 		);
 	}
 
-	for (const auto& renderable : renderables)
-		lightRenderer.pushRenderable(renderable);
+	for (const auto& cubeRenderable : cubeRenderables)
+		lightRenderer.pushRenderable(cubeRenderable);
 
 	lightRenderer.pushRenderable(LightRenderer::Renderable(
-		planeMesh, planeTransform, glm::vec4(1.f, 1.f, 1.f, 1.f), nullptr, nullptr, nullptr,
+		planeMesh, planeTransform, glm::vec4(1.f), nullptr, nullptr, nullptr,
 		0.03f, 1.f, 0.7f, 200.f
 	));
 

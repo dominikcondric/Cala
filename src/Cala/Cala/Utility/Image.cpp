@@ -4,36 +4,52 @@
 #include "Logger.h"
 
 namespace Cala {
-	Image::Image(const std::filesystem::path& path)
+	Image::Image(const std::filesystem::path& pathToImage)
 	{
-		loadImage(path);
+		load(pathToImage);
 	}
 
-	Image::~Image()
+    Image::Image(Image &&other)
 	{
+		*this = std::move(other);
+	}
+
+    Image& Image::operator=(Image &&other)
+    {
+		width = other.width;
+		height = other.height;
+		channelCount = other.channelCount;
+		data = other.data;
+		other.data = nullptr;
+		path = std::move(other.path);
+		return *this;
+    }
+
+    Image::~Image()
+    {
 		if (data != nullptr)
 			freeData();
 	}
 
-	void Image::loadImage(const std::filesystem::path& path)
+	void Image::load(const std::filesystem::path& pathToImage)
 	{
 		if (data != nullptr)
 			freeData();
 
-		if (!std::filesystem::exists(path))
+		if (!std::filesystem::exists(pathToImage))
 		{
-			Logger::getInstance().logErrorToConsole("Path " + path.string() + " not valid!");
+			Logger::getInstance().logErrorToConsole("Path " + pathToImage.string() + " not valid!");
 			return;
 		}
 
-		if (!path.extension().compare("jpg") || !path.extension().compare("png") || !path.extension().compare("jpeg"))
+		if (!pathToImage.extension().compare("jpg") || !pathToImage.extension().compare("png") || !pathToImage.extension().compare("jpeg"))
 		{
-			Logger::getInstance().logErrorToConsole("Path " + path.string() + " has invalid file extension!");
+			Logger::getInstance().logErrorToConsole("Path " + pathToImage.string() + " has invalid file extension!");
 			return;
 		}
 
-		this->path = path.string();
-		data = stbi_load(path.string().c_str(), &width, &height, &channelCount, 0);
+		path = pathToImage.string();
+		data = stbi_load(path.c_str(), &width, &height, &channelCount, 0);
 
 		if (data == nullptr)
 			Logger::getInstance().logErrorToConsole("Image not loaded properly.");

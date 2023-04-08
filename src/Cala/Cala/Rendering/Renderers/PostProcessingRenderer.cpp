@@ -10,23 +10,30 @@ namespace Cala {
 		shader.attachShader(Shader::ShaderType::FragmentShader, shadersDir / "PostProcessingFragmentShader.glsl");
 		shader.createProgram();
 
-		Texture::Specification texSpec(framebufferTargetsSize.x, framebufferTargetsSize.y, ITexture::Format::RGBA, Texture::Dimensionality::TwoDimensional);
+		Texture::Specification colorTextureSpecification(
+			framebufferTargetsSize.x, framebufferTargetsSize.y, 
+			ITexture::Format::RGBA, Texture::Dimensionality::TwoDimensional
+		);
+
 		for (int i = 0; i < 3; ++i)
 		{
 			Texture* colorTarget = new Texture;
-			colorTarget->generateTexture(texSpec, nullptr);
+			colorTarget->load(colorTextureSpecification, nullptr);
 			helperFramebuffers[i].addColorTarget(colorTarget, true);
 
 			if (i == 0)
 			{
 				Texture* depthTarget = new Texture;
-				Texture::Specification depthTexSpec(
-					framebufferTargetsSize.x, framebufferTargetsSize.y, Texture::Format::DEPTH24_STENCIL8, Texture::Dimensionality::TwoDimensional);
-				depthTarget->generateTexture(depthTexSpec, nullptr);
+				Texture::Specification depthTextureSpecification(
+					framebufferTargetsSize.x, framebufferTargetsSize.y, 
+					Texture::Format::DEPTH24_STENCIL8, Texture::Dimensionality::TwoDimensional
+				);
+
+				depthTarget->load(depthTextureSpecification, nullptr);
 				helperFramebuffers[i].addDepthTarget(depthTarget, true);
 			}
 
-			helperFramebuffers[i].loadFramebuffer();
+			helperFramebuffers[i].load();
 		}	
 
 		effectsBuffer.setData(shader.getConstantBufferInfo("EffectValues"), true);
@@ -44,7 +51,7 @@ namespace Cala {
 		modelLayouts.push_back({ 1, 2, 4 * sizeof(float), 2 * sizeof(float), 1 });
 
 		quadModel.loadCustomModel(renderingQuadVertices, 4, {}, modelLayouts, Model::DrawingMode::TriangleStrip);
-		renderingQuad.loadMesh(quadModel, false);
+		renderingQuad.loadFromModel(quadModel, false);
 
 		effects.reserve(5);
 	}

@@ -88,7 +88,10 @@ bool isSpotlight(const Light light)
 
 mat4 calculateLightViewMatrix(const Light light, const vec3 direction)
 {
-	vec3 up = normalize(vec3(0.4f, 0.1235f, 1.235f)); // Initialize up to random normalized vector not parallel to direction
+	vec3 up = vec3(0.f, 1.f, 0.f);
+	if (abs(direction.x) < 1e-7 && abs(direction.z) < 1e-7) 
+		up.x = 0.001f;
+
 	vec3 right = normalize(cross(up, direction)); // Get first perpendicular vector from random up and direction
 	up = cross(direction, right); // Get third perpendicular vector from direction, and right
 

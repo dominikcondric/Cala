@@ -95,25 +95,6 @@ namespace Cala {
 		glPointSize(size);
 	}
 
-	void GraphicsAPI::readFromBoundFramebuffer(const glm::uvec2& pixelCoordinats, const glm::uvec2& areaSize, DataType type, void* dataToWrite) const
-	{
-		GLenum dataType;
-		switch (type)
-		{
-			case GraphicsAPI::DataType::Depth:
-				dataType = GL_DEPTH_COMPONENT;
-				break;
-			case GraphicsAPI::DataType::Stencil:
-				dataType = GL_STENCIL_COMPONENTS;
-				break;
-			case GraphicsAPI::DataType::Color:
-				dataType = GL_COLOR_COMPONENTS;
-				break;
-		}
-
-		glReadPixels(pixelCoordinats.x, pixelCoordinats.y, areaSize.x, areaSize.y, GL_FLOAT, dataType, dataToWrite);
-	}
-
     void GraphicsAPI::activateDefaultFramebuffer()
     {
 		glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
@@ -181,6 +162,11 @@ namespace Cala {
 
 	void GraphicsAPI::render(const Mesh& mesh) const
 	{
+		if (mesh.culled)
+			enableSetting(FaceCulling);
+		else 
+			disableSetting(FaceCulling);
+
 		mesh.setForRendering();
 		if (mesh.getIndexCount() == 0)
 			draw(mesh.getDrawingMode(), mesh.getVertexCount());

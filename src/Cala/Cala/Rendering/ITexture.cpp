@@ -23,9 +23,9 @@ namespace Cala {
         textureHandle = other.textureHandle;
         width = other.width;
         height = other.height;
-        nativeTextureType = other.nativeTextureType;
-        internalTextureFormat = other.internalTextureFormat;
-        textureFormat = other.textureFormat;
+        nativeType = other.nativeType;
+        internalFormat = other.internalFormat;
+        format = other.format;
         dataType = other.dataType;
         other.textureHandle = GL_NONE;
         writeOnly = other.writeOnly;
@@ -39,12 +39,12 @@ namespace Cala {
             return;
 
         glActiveTexture(GL_TEXTURE0 + bindingIndex);
-        glBindTexture(nativeTextureType, textureHandle);
+        glBindTexture(nativeType, textureHandle);
     }
 
     bool ITexture::isDepth() const
     {
-        return textureFormat == GL_DEPTH_COMPONENT;
+        return format == GL_DEPTH_COMPONENT;
     }
 
     bool ITexture::isColor() const
@@ -54,58 +54,57 @@ namespace Cala {
 
     bool ITexture::isDepthStencil() const
     {
-        return textureFormat == GL_DEPTH_STENCIL;
+        return format == GL_DEPTH_STENCIL;
     }
 
-    void ITexture::initializeTextureData(const Specification &specification)
+    void ITexture::initializeData(const Specification &specification)
     {
         width = specification.width;
         height = specification.height;
         dimensionality = specification.dimensionality;
         writeOnly = specification.writeOnly;
-
         
         switch (specification.format)
         {
             case Format::RGB:
-                internalTextureFormat = GL_RGB;
-                textureFormat = GL_RGB;
+                internalFormat = GL_RGB;
+                format = GL_RGB;
                 dataType = GL_UNSIGNED_BYTE;
                 break;
             case Format::RGBA:
-                internalTextureFormat = GL_RGBA;
-                textureFormat = GL_RGB;
+                internalFormat = GL_RGBA;
+                format = GL_RGB;
                 dataType = GL_UNSIGNED_BYTE;
                 break;
             case Format::GAMMA_RGBA:
-                internalTextureFormat = GL_SRGB_ALPHA;
-                textureFormat = GL_SRGB;
+                internalFormat = GL_SRGB_ALPHA;
+                format = GL_SRGB;
                 dataType = GL_UNSIGNED_BYTE;
                 break;
             case Format::FLOAT_RGBA:
-                internalTextureFormat = GL_RGBA32F;
-                textureFormat = GL_RGB;
+                internalFormat = GL_RGBA32F;
+                format = GL_RGB;
                 dataType = GL_FLOAT;
                 break;
             case Format::DEPTH16:
-                internalTextureFormat = GL_DEPTH_COMPONENT16;
-                textureFormat = GL_DEPTH_COMPONENT;
+                internalFormat = GL_DEPTH_COMPONENT16;
+                format = GL_DEPTH_COMPONENT;
                 dataType = GL_FLOAT;
                 break;
             case Format::DEPTH32:
-                internalTextureFormat = GL_DEPTH_COMPONENT32;
-                textureFormat = GL_DEPTH_COMPONENT;
+                internalFormat = GL_DEPTH_COMPONENT32;
+                format = GL_DEPTH_COMPONENT;
                 dataType = GL_FLOAT;
                 break;
             case Format::DEPTH24_STENCIL8:
-                internalTextureFormat = GL_DEPTH24_STENCIL8;
-                textureFormat = GL_DEPTH_STENCIL;
+                internalFormat = GL_DEPTH24_STENCIL8;
+                format = GL_DEPTH_STENCIL;
                 dataType = GL_UNSIGNED_INT_24_8;
                 break;
         }
     }
 
-    void ITexture::setTextureParameters(const Specification &specification) const
+    void ITexture::setParameters(const Specification &specification) const
     {
         auto translateMethod = [](WrappingMethod method) -> GLuint
         {
@@ -128,21 +127,21 @@ namespace Cala {
             }
         };
 
-        glTexParameteri(nativeTextureType, GL_TEXTURE_MAG_FILTER, specification.renderingStyle.magFilter == Filter::Linear ? GL_LINEAR : GL_NEAREST);
-        glTexParameteri(nativeTextureType, GL_TEXTURE_MIN_FILTER, specification.renderingStyle.minFilter == Filter::Linear ? GL_LINEAR : GL_NEAREST);
-        glTexParameterfv(nativeTextureType, GL_TEXTURE_BORDER_COLOR, specification.borderColor);
-        glTexParameteri(nativeTextureType, GL_TEXTURE_WRAP_S, translateMethod(specification.renderingStyle.sDimensionWrap));
+        glTexParameteri(nativeType, GL_TEXTURE_MAG_FILTER, specification.renderingStyle.magFilter == Filter::Linear ? GL_LINEAR : GL_NEAREST);
+        glTexParameteri(nativeType, GL_TEXTURE_MIN_FILTER, specification.renderingStyle.minFilter == Filter::Linear ? GL_LINEAR : GL_NEAREST);
+        glTexParameterfv(nativeType, GL_TEXTURE_BORDER_COLOR, specification.borderColor);
+        glTexParameteri(nativeType, GL_TEXTURE_WRAP_S, translateMethod(specification.renderingStyle.sDimensionWrap));
 
         if (dimensionality == Dimensionality::TwoDimensional) 
-            glTexParameteri(nativeTextureType, GL_TEXTURE_WRAP_T, translateMethod(specification.renderingStyle.tDimensionWrap));
+            glTexParameteri(nativeType, GL_TEXTURE_WRAP_T, translateMethod(specification.renderingStyle.tDimensionWrap));
         
         if (dimensionality == Dimensionality::ThreeDimensional || dimensionality == Dimensionality::Cubemap) 
-            glTexParameteri(nativeTextureType, GL_TEXTURE_WRAP_R, translateMethod(specification.renderingStyle.rDimensionWrap));
+            glTexParameteri(nativeType, GL_TEXTURE_WRAP_R, translateMethod(specification.renderingStyle.rDimensionWrap));
 
         if (!isColor())
         {
-            glTexParameteri(nativeTextureType, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-            glTexParameteri(nativeTextureType, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
+            glTexParameteri(nativeType, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+            glTexParameteri(nativeType, GL_TEXTURE_COMPARE_FUNC, GL_GEQUAL);
         }
     }
 #else

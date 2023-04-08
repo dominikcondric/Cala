@@ -17,9 +17,9 @@ namespace Cala {
 		Texture& operator=(const Texture& other) = delete;
 		Texture& operator=(Texture&& other) noexcept;
 		~Texture() override = default;
-		void load2DTextureFromImage(const Image& image, const RenderingStyle& renderingStyle);
-        void loadCubemapFromImages(const std::array<Image, 6> &images, const RenderingStyle& renderingStyle);
-        void generateTexture(const Specification &specification, void *data);
+		void load2DTextureFromImage(const Image& image, const RenderingStyle& renderingStyle = RenderingStyle());
+        void loadCubemapFromImages(const std::array<Image, 6> &images, const RenderingStyle& renderingStyle = RenderingStyle());
+        void load(const Specification &specification, void *data);
 	};
 }
 

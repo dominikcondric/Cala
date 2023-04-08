@@ -23,7 +23,6 @@ namespace Cala {
 		int lightened = 0;
 		materialsBuffer.updateData("lightened", &lightened, sizeof(int));
 
-		api->enableSetting(GraphicsAPI::FaceCulling);
 		api->enableSetting(GraphicsAPI::DepthTesting);
 		while (!renderablesStack.empty())
 		{
@@ -34,7 +33,6 @@ namespace Cala {
 			renderablesStack.pop();
 		}
 
-		api->disableSetting(GraphicsAPI::FaceCulling);
 		api->disableSetting(GraphicsAPI::DepthTesting);
 	}
 

@@ -24,7 +24,6 @@ namespace Cala {
 		glm::ivec4 getCurrentViewport() const;
 		void setRenderingPointSize(float size) const;
 		void clearFramebuffer() const;
-		void readFromBoundFramebuffer(const glm::uvec2& pixelCoordinates, const glm::uvec2& areaSize, DataType type, void* dataToWrite) const;
 		void activateDefaultFramebuffer();
 		void activateFramebuffer(const Framebuffer& framebuffer);
 		const Framebuffer* getActiveFramebuffer() const { return activeFramebuffer; }

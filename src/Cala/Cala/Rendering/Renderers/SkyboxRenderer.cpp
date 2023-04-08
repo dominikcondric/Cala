@@ -3,7 +3,7 @@
 namespace Cala {
 	SkyboxRenderer::SkyboxRenderer(Texture* tex) : texture(tex)
 	{
-		mesh.loadMesh(Model().loadCube(), false);
+		mesh.loadFromModel(Model().loadCube(), false);
 		std::filesystem::path shadersDir(SHADERS_DIR);
 		shader.attachShader(Shader::ShaderType::VertexShader, shadersDir / "SkyboxVertexShader.glsl");
 		shader.attachShader(Shader::ShaderType::FragmentShader, shadersDir / "SkyboxFragmentShader.glsl");

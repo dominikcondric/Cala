@@ -10,16 +10,16 @@ namespace Cala {
 
     void Logger::logErrorToConsole(std::string_view message) const
     {
-        std::cerr << message << std::endl;
+        std::cerr << "[ERROR]: " << message << std::endl;
     }
 
     void Logger::logInfoToConsole(std::string_view message) const
     {
-        std::cout << message << std::endl;
+        std::cout << "[INFO]: " << message << std::endl;
     }
 
     void Logger::logDebugToConsole(std::string_view message) const
     {
-        std::clog << message << std::endl;
+        std::clog << "[DEBUG]: " << message << std::endl;
     }
 }

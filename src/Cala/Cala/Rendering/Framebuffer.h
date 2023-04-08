@@ -30,7 +30,7 @@ namespace Cala {
 		*/
 		void addDepthTarget(TextureArray* target, bool transferOwnership, uint32_t layer);
 
-		void loadFramebuffer();
+		void load();
         const ITexture& getColorTarget(uint32_t index) const;
 		const ITexture& getDepthTarget() const;
 

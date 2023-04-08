@@ -33,25 +33,25 @@ namespace Cala {
 			const IOSystem& ioSystem = window->getIO();
 
 			if (ioSystem.isMouseButtonPressed(IOSystem::MOUSE_BUTTON_RIGHT))
-				camera.rotateCamera(ioSystem.getCursorOffset());
+				camera.rotate(ioSystem.getCursorOffset());
 
 			if (ioSystem.isKeyPressed(IOSystem::KEY_W))
-				camera.moveCamera(Camera::Directions::FORWARD, MOVE_SPEED);
+				camera.move(Camera::Directions::FORWARD, MOVE_SPEED);
 
 			if (ioSystem.isKeyPressed(IOSystem::KEY_S))
-				camera.moveCamera(Camera::Directions::BACKWARD, MOVE_SPEED);
+				camera.move(Camera::Directions::BACKWARD, MOVE_SPEED);
 
 			if (ioSystem.isKeyPressed(IOSystem::KEY_A))
-				camera.moveCamera(Camera::Directions::LEFT, MOVE_SPEED);
+				camera.move(Camera::Directions::LEFT, MOVE_SPEED);
 
 			if (ioSystem.isKeyPressed(IOSystem::KEY_D))
-				camera.moveCamera(Camera::Directions::RIGHT, MOVE_SPEED);
+				camera.move(Camera::Directions::RIGHT, MOVE_SPEED);
 
 			if (ioSystem.isKeyPressed(IOSystem::KEY_SPACE))
-				camera.moveCamera(Camera::Directions::UP, MOVE_SPEED);
+				camera.move(Camera::Directions::UP, MOVE_SPEED);
 
 			if (ioSystem.isKeyPressed(IOSystem::KEY_LEFT_SHIFT))
-				camera.moveCamera(Camera::Directions::DOWN, MOVE_SPEED);
+				camera.move(Camera::Directions::DOWN, MOVE_SPEED);
 		}
 
 		window->update();

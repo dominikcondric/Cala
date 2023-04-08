@@ -21,8 +21,8 @@ namespace Cala {
 
 	Framebuffer& Framebuffer::operator=(Framebuffer&& other) noexcept
 	{
-		other.colorTargets = std::move(colorTargets);
-		other.depthTarget = std::move(depthTarget);
+		colorTargets = std::move(other.colorTargets);
+		depthTarget = std::move(other.depthTarget);
 		framebufferHandle = other.framebufferHandle;
 		other.framebufferHandle = GL_NONE;
 		return *this;
@@ -64,7 +64,7 @@ namespace Cala {
 		depthTarget.layer = layer;
     }
 
-    void Framebuffer::loadFramebuffer()
+    void Framebuffer::load()
     {
 		if (colorTargets.empty() && depthTarget.target == nullptr)
 			return;
@@ -87,7 +87,7 @@ namespace Cala {
 			{
 				const ITexture& texture = *colorTargets[i].target;
 				colorAttachmentEnum[i] = GL_COLOR_ATTACHMENT0 + i;
-				GLuint textureHandle = texture.getNativeTextureHandle();
+				GLuint textureHandle = texture.getNativeHandle();
 				if (texture.isWriteOnly())
 				{
 					glFramebufferRenderbuffer(GL_FRAMEBUFFER, colorAttachmentEnum[i], GL_RENDERBUFFER, textureHandle);
@@ -104,7 +104,7 @@ namespace Cala {
 					} 
 				}
 			}
-			glDrawBuffers(colorTargets.size(), colorAttachmentEnum);
+			glDrawBuffers((GLsizei)colorTargets.size(), colorAttachmentEnum);
 		} 
 		else
 		{
@@ -115,7 +115,7 @@ namespace Cala {
 		if (depthTarget.target != nullptr)
 		{	
 			const ITexture& depthTexture = *depthTarget.target;
-			GLuint textureHandle = depthTexture.getNativeTextureHandle();
+			GLuint textureHandle = depthTexture.getNativeHandle();
 			GLenum attachmentType = depthTarget->isDepth() ? GL_DEPTH_ATTACHMENT : GL_DEPTH_STENCIL_ATTACHMENT;
 			if (depthTexture.isWriteOnly())
 			{
@@ -168,10 +168,10 @@ namespace Cala {
 
     Framebuffer::Target& Framebuffer::Target::operator=(Target&& other) noexcept
     {
-		other.target = target;
-		other.owned = owned;
-		other.layer = layer;
-		owned = false;
+		target = other.target;
+		owned = other.owned;
+		layer = other.layer;
+		other.owned = false;
 		return *this;
     }
 
