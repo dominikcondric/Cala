@@ -26,16 +26,6 @@ set(src_files
     Utility/BaseApplication.h        Utility/BaseApplication.cpp
     Utility/Logger.h                Utility/Logger.cpp
     Utility/Platform.h
-
-    // Rendering/Shaders/HelperGridFragmentShader.glsl
-    // Rendering/Shaders/HelperGridGeometryShader.glsl
-    // Rendering/Shaders/HelperGridVertexShader.glsl
-    // Rendering/Shaders/GeneralVertexShader.glsl
-    // Rendering/Shaders/LightFragmentShader.glsl
-    // Rendering/Shaders/PostProcessingVertexShader.glsl
-    // Rendering/Shaders/PostProcessingFragmentShader.glsl
-    // Rendering/Shaders/SkyboxVertexShader.glsl
-    // Rendering/Shaders/SkyboxFragmentShader.glsl
 )
 
 # Cala library
