@@ -20,6 +20,8 @@ namespace Cala {
 
     void Logger::logDebugToConsole(std::string_view message) const
     {
-        std::clog << "[DEBUG]: " << message << std::endl;
+        #ifndef NDEBUG
+            std::clog << "[DEBUG]: " << message << std::endl;
+        #endif
     }
 }

@@ -11,7 +11,7 @@
 #define SHADOW_MAP_BINDING 3
 
 namespace Cala {
-	LightRenderer::LightRenderer()
+	LightRenderer::LightRenderer(glm::uvec2 shadowMapDimensions)
 	{
 		std::filesystem::path shadersDir(SHADERS_DIR);
 		mainShader.attachShader(Shader::ShaderType::VertexShader, shadersDir / "GeneralVertexShader.glsl");
@@ -29,7 +29,7 @@ namespace Cala {
 
 		TextureArray* depthTextureArray = new TextureArray;
 		Texture::Specification depthTextureSpecification(
-			800, 800, ITexture::Format::DEPTH32, 
+			shadowMapDimensions.x, shadowMapDimensions.y, ITexture::Format::DEPTH32, 
 			Texture::Dimensionality::TwoDimensional
 		);
 

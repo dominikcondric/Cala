@@ -4,7 +4,7 @@
 #define LIGHT_MOVE 10.f * time.deltaTime
 
 DemoApplication::DemoApplication() : BaseApplication(Window::Specification("Demo", 1920, 1080, 4)),
-sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(Model().loadPlane())
+sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(Model().loadPlane(), false, false)
 {
 	camera.setProjectionViewingAngle(90.f);
 	camera.setProjectionFarPlane(100.f);
@@ -30,7 +30,6 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(M
 	wallTransforms[2].translate(glm::vec3(-20.f, 10.f, 0.f)).scale(glm::vec3(40.f, 20.f, 0.5f)).rotate(90.f, glm::vec3(0.f, 1.f, 0.f)); // Left wall
 
 	planeTransform.scale(40.f);
-	planeMesh.culled = false;
 
 	glm::vec2 rand = glm::diskRand(10.f);
 	lightTransformation.translate(glm::vec3(rand.x, 7.f, rand.y)).scale(0.2f);

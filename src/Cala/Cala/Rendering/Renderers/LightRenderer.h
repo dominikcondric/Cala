@@ -9,7 +9,7 @@
 namespace Cala {
 	class LightRenderer : public IRenderer {
 	public:
-		LightRenderer();
+		LightRenderer(glm::uvec2 shadowMapDimensions = glm::uvec2(1024U));
 		~LightRenderer() override = default;
 		void render(GraphicsAPI* const api, const Camera& camera) override;
 

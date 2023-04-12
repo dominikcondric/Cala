@@ -51,7 +51,7 @@ namespace Cala {
 		modelLayouts.push_back({ 1, 2, 4 * sizeof(float), 2 * sizeof(float), 1 });
 
 		quadModel.loadCustomModel(renderingQuadVertices, 4, {}, modelLayouts, Model::DrawingMode::TriangleStrip);
-		renderingQuad.loadFromModel(quadModel, false);
+		renderingQuad.loadFromModel(quadModel, false, false);
 
 		effects.reserve(5);
 	}
@@ -97,7 +97,6 @@ namespace Cala {
 
 		shader.activate();
 		api->disableSetting(GraphicsAPI::DepthTesting);
-		api->disableSetting(GraphicsAPI::FaceCulling);
 		api->setPolygonFillingMode(GraphicsAPI::FrontAndBack, GraphicsAPI::Fill);
 
 		for (const auto& [effect, value] : effects)

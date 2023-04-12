@@ -8,14 +8,14 @@
 namespace Cala {
 	class Mesh {
 	public:
-		Mesh(const Model& model, bool dynamic = false);
+		Mesh(const Model& model, bool dynamic = false, bool _culled = true);
 		Mesh() = default;
 		~Mesh();
 		Mesh(const Mesh& other) = delete;
 		Mesh(Mesh&& other) noexcept;
 		Mesh& operator=(const Mesh& other) = delete;
 		Mesh& operator=(Mesh&& other) noexcept;
-		void loadFromModel(const Model& model, bool dynamic = false);
+		void loadFromModel(const Model& model, bool dynamic = false, bool _culled = true);
 		void updateIndexBufferData(const uint32_t* data, uint32_t arraySize, uint32_t arrayOffset);
 		void updateIndexBufferData(const std::vector<uint32_t>& data, uint32_t arrayOffset);
 		void updateVertexBufferData(const float* data, uint32_t arraySize, uint32_t arrayOffset);

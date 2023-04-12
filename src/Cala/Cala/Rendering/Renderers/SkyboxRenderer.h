@@ -5,16 +5,16 @@
 namespace Cala {
 	class SkyboxRenderer : public IRenderer {
 	public:
-		SkyboxRenderer(Texture* tex);
+		SkyboxRenderer(const Texture* _texture = nullptr);
 		~SkyboxRenderer() override = default;
 		void render(GraphicsAPI* const api, const Camera& camera) override;
-		void setTexture(Texture* tex) { texture = tex; }
+		void setTexture(const Texture* _texture);
 
 	private:
 		Mesh mesh;
 		Shader shader;
 		ConstantBuffer mvpBuffer;
 		ConstantBuffer skyboxBlurBuffer;
-		Texture* texture = nullptr;
+		const Texture* texture = nullptr;
 	};
 }
