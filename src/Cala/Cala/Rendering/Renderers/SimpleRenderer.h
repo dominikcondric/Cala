@@ -1,14 +1,16 @@
 #pragma once 
-#include "IRenderer.h"
+#include "ICameraRenderer.h"
 #include <stack>
 #include "Cala/Utility/Transformation.h"
+#include "Cala/Rendering/Shader.h"
 
 namespace Cala {
-	class SimpleRenderer : public IRenderer {
+	class SimpleRenderer : public ICameraRenderer {
 	public:
 		SimpleRenderer();
-		~SimpleRenderer() override = default;
-		void render(GraphicsAPI* const, const Camera& camera) override;
+        ~SimpleRenderer() override = default;
+        void render(GraphicsAPI *const api, const Framebuffer* renderingTarget);
+		void setupCamera(const Camera& camera) override;
 
 		struct Renderable {
 			Renderable(const Mesh& _mesh, const Transformation& _transformation, const glm::vec4 _color) :

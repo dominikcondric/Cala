@@ -1,9 +1,9 @@
 #pragma once
+#include "IRenderer.h"
 #include "Cala/Rendering/Framebuffer.h"
 #include "Cala/Rendering/GraphicsAPI.h"
 #include "Cala/Rendering/Shader.h"
 #include "Cala/Rendering/ConstantBuffer.h"
-#include "IRenderer.h"
 
 namespace Cala {
 	class PostProcessingRenderer : IRenderer {
@@ -11,9 +11,10 @@ namespace Cala {
 		PostProcessingRenderer();
 		~PostProcessingRenderer() = default;
 		void begin(GraphicsAPI* api);
-		void render(GraphicsAPI* const api, const Camera& camera) override;
+        void render(GraphicsAPI *api, const Framebuffer *renderingTarget);
+		const Framebuffer* getRenderingTarget() const { return &helperFramebuffers[0]; }
 
-		enum PostProcessingEffect {
+        enum PostProcessingEffect {
 			Bloom = 0,
 			HDR = 1,
 			BoxBlur = 2,

@@ -38,7 +38,7 @@ namespace Cala {
 		shadowsFramebuffer.load();
 	}
 
-	void LightRenderer::pushRenderable(const Renderable& renderable)
+    void LightRenderer::pushRenderable(const Renderable& renderable)
 	{
 		int state = 0;
 
@@ -120,10 +120,15 @@ namespace Cala {
 		lightsBuffer.updateData(lightsString + "projection", &projection[0][0], sizeof(glm::mat4));
 	}
 
-    void LightRenderer::render(GraphicsAPI* const api, const Camera &camera)
+	void LightRenderer::setupCamera(const Camera &camera)
     {
 		mvpBuffer.updateData("eyePosition", &camera.getPosition().x, sizeof(glm::vec4));
+		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
+		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
+    }
 
+    void LightRenderer::render(GraphicsAPI* const api, const Framebuffer* renderingTarget)
+    {
 		int shadowsInt = shadows;
 		lightsBuffer.updateData("shadows", &shadowsInt, sizeof(shadowsInt));
 
@@ -144,13 +149,12 @@ namespace Cala {
 		/**
 		 * Rendering to shadow map
 		*/
-		const Framebuffer* activeFramebuffer = api->getActiveFramebuffer();
 		api->enableSetting(GraphicsAPI::DepthTesting);
 		if (shadows)
 		{
 			shadowPassShader.activate();
 			api->setBufferClearingBits(false, true, false);
-			api->activateFramebuffer(shadowsFramebuffer);
+			api->activateFramebuffer(&shadowsFramebuffer);
 			glm::ivec2 depthTextureSize = shadowsFramebuffer.getDepthTarget().getDimensions();
 			api->setViewport({ 0, 0, depthTextureSize.x, depthTextureSize.y });
 			api->clearFramebuffer();
@@ -170,14 +174,9 @@ namespace Cala {
 		 * Setting up uniforms for normal rendering
 		*/
 		mainShader.activate();
-		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
-		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
+		
 
-		if (activeFramebuffer != nullptr)
-			api->activateFramebuffer(*activeFramebuffer);
-		else
-			api->activateDefaultFramebuffer();
-			
+		api->activateFramebuffer(renderingTarget);			
 		api->setViewport(currentViewport);
 		api->setBufferClearingBits(true, true, true);
 		int lightened = 1;

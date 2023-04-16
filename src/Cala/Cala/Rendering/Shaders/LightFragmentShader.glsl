@@ -73,7 +73,7 @@ float attenuation(const Light light)
 
 bool isPoint(const Light light)
 {
-	return light.cutoff < 1.5f;
+	return light.cutoff < -1.5f;
 }
 
 bool isDirectional(const Light light)

@@ -3,18 +3,19 @@
 
 #define LIGHT_MOVE 10.f * time.deltaTime
 
-DemoApplication::DemoApplication() : BaseApplication(Window::Specification("Demo", 1920, 1080, 4)),
-sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(Model().loadPlane(), false, false)
+DemoApplication::DemoApplication() : BaseApplication(Window::Specification("Demo", 1024, 768, 4)),
+sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube())
 {
 	camera.setProjectionViewingAngle(90.f);
 	camera.setProjectionFarPlane(100.f);
+	camera.setPosition(glm::vec3(0.f, 40.f, 25.f));
 
 	// Reserves are VERY important for memory consistency (references!!!)
 	transformations.reserve(100);
 	cubeRenderables.reserve(100);
 	for (int i = 0; i < 100; ++i) {
 		Transformation transformation;
-		glm::vec2 diskRand = glm::diskRand(20.f);
+		glm::vec2 diskRand = glm::diskRand(19.f);
 		transformation.scale(glm::linearRand(0.5f, 2.f)).translate(glm::vec3(diskRand.x, glm::linearRand(4.f, 8.f), diskRand.y));
 		transformations.push_back(transformation);
 
@@ -28,8 +29,7 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(M
 	wallTransforms[3].translate(glm::vec3(0.f, 10.f, -20.f)).scale(glm::vec3(40.f, 20.f, 0.5f)); // Down wall
 	wallTransforms[1].translate(glm::vec3(20.f, 10.f, 0.f)).scale(glm::vec3(40.f, 20.f, 0.5f)).rotate(90.f, glm::vec3(0.f, 1.f, 0.f)); // Right wall
 	wallTransforms[2].translate(glm::vec3(-20.f, 10.f, 0.f)).scale(glm::vec3(40.f, 20.f, 0.5f)).rotate(90.f, glm::vec3(0.f, 1.f, 0.f)); // Left wall
-
-	planeTransform.scale(40.f);
+	wallTransforms[4].scale(glm::vec3(40.f, 1.f, 40.f)); // Left wall
 
 	glm::vec2 rand = glm::diskRand(10.f);
 	lightTransformation.translate(glm::vec3(rand.x, 7.f, rand.y)).scale(0.2f);
@@ -39,7 +39,7 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube()), planeMesh(M
 
 void DemoApplication::loop()
 {
-	api->activateDefaultFramebuffer();
+	api->activateFramebuffer(nullptr);
 	api->clearFramebuffer();
 
 	lightRenderer.pushLight(
@@ -67,13 +67,10 @@ void DemoApplication::loop()
 	for (const auto& cubeRenderable : cubeRenderables)
 		lightRenderer.pushRenderable(cubeRenderable);
 
-	lightRenderer.pushRenderable(LightRenderer::Renderable(
-		planeMesh, planeTransform, glm::vec4(1.f), nullptr, nullptr, nullptr,
-		0.03f, 1.f, 0.7f, 200.f
-	));
-
-	lightRenderer.render(api.get(), camera);
-	simpleRenderer.render(api.get(), camera);
+	simpleRenderer.setupCamera(camera);
+	lightRenderer.setupCamera(camera);
+	simpleRenderer.render(api.get(), nullptr);
+	lightRenderer.render(api.get(), nullptr);
 
 	const IOSystem& io = window->getIO();
 	const float moveFactor = 10.f;

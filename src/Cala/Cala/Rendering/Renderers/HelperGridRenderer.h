@@ -1,28 +1,28 @@
 #pragma once 
-#include "Cala/Rendering/GraphicsAPI.h"
+#include "ICameraRenderer.h"
 #include "Cala/Rendering/Mesh.h"
 #include "Cala/Rendering/Shader.h"
 #include "Cala/Rendering/ConstantBuffer.h"
-#include "Cala/Rendering/Camera.h"
-#include "IRenderer.h"
 #include "Cala/Utility/Transformation.h"
 
 namespace Cala {
-	class HelperGridRenderer : public IRenderer {
+	class HelperGridRenderer : public ICameraRenderer {
 	public:
 		HelperGridRenderer();
 		~HelperGridRenderer() = default;
-		void render(GraphicsAPI* const api, const Camera& camera) override;
+		void render(GraphicsAPI* const api, const Framebuffer* renderingTarget) override;
+		void setupCamera(const Camera& camera) override;
+		void setMoveXZWithCamera(bool move);
 
-		glm::vec4 color{ 0.1f, 0.1f, 0.1f, 0.1f };		
+		glm::vec4 gridColor{ 0.1f, 0.1f, 0.1f, 0.1f };
 
 	private:
 		Shader shader;
 		ConstantBuffer mvpBuffer;
 		ConstantBuffer meshDataBuffer;
 		Mesh gridMesh;
-		float updateDistance = 1.f;
 		uint32_t gridSize = 50;
 		Transformation transformation;
+		bool moveXZWithCamera = true;
 	};
 }

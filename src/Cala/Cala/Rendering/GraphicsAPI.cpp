@@ -1,6 +1,4 @@
-#include <iostream>
 #include "GraphicsAPI.h"
-#include <glm/gtx/string_cast.hpp>
 #include "Shader.h"
 #include "Mesh.h"
 #include "Texture.h"
@@ -9,9 +7,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Cala/Utility/Logger.h"
+#include <cstdlib>
 
 namespace Cala {
 	GraphicsAPI* GraphicsAPI::instance = nullptr;
+	bool GraphicsAPI::apiFunctionsLoaded = false;
 
 #ifdef CALA_API_OPENGL
 	GraphicsAPI* GraphicsAPI::construct()
@@ -59,6 +59,31 @@ namespace Cala {
 		}
     }
 
+    void GraphicsAPI::loadAPIFunctions()
+    {
+		if (!apiFunctionsLoaded)
+		{
+			if (glfwGetCurrentContext() != nullptr)
+			{
+				if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+				{
+					Logger::getInstance().logErrorToConsole("Failed to load OpenGL!");
+					std::exit(-1);
+				}
+			}
+			else
+			{
+				if (!gladLoadGL())
+				{
+					Logger::getInstance().logErrorToConsole("Failed to load OpenGL!");
+					std::exit(-1);
+				}
+			}
+
+			apiFunctionsLoaded = true;
+		}
+    }
+
     void GraphicsAPI::setBufferClearingColor(const glm::vec4& color) const
 	{
 		glClearColor(color.x, color.y, color.z, color.w);
@@ -95,17 +120,13 @@ namespace Cala {
 		glPointSize(size);
 	}
 
-    void GraphicsAPI::activateDefaultFramebuffer()
+    void GraphicsAPI::activateFramebuffer(const Framebuffer* framebuffer)
     {
-		glBindFramebuffer(GL_FRAMEBUFFER, GL_NONE);
-		activeFramebuffer = nullptr;
-    }
+		GLuint framebufferHandle = 0;
+		if (framebuffer != nullptr)
+			framebufferHandle = framebuffer->getNativeFramebufferHandle();
 
-    void GraphicsAPI::activateFramebuffer(const Framebuffer& framebuffer)
-    {
-		GLuint framebufferID = framebuffer.getNativeFramebufferHandle();
-		glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
-		activeFramebuffer = &framebuffer;
+		glBindFramebuffer(GL_FRAMEBUFFER, framebufferHandle);
     }
 
     void GraphicsAPI::enableSetting(Constant setting) const

@@ -11,6 +11,7 @@ set(src_files
     Rendering/NativeAPI.h
     
     Rendering/Renderers/IRenderer.h
+    Rendering/Renderers/ICameraRenderer.h
     Rendering/Renderers/LightRenderer.h         Rendering/Renderers/LightRenderer.cpp 
     Rendering/Renderers/SkyboxRenderer.h        Rendering/Renderers/SkyboxRenderer.cpp 
     Rendering/Renderers/SimpleRenderer.h   Rendering/Renderers/SimpleRenderer.cpp 

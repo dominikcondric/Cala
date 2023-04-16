@@ -13,38 +13,49 @@ namespace Cala {
 
 		mvpBuffer.setData(shader.getConstantBufferInfo("MVP"), false);
 		skyboxBlurBuffer.setData(shader.getConstantBufferInfo("SkyboxBlur"), false);
-		int blurLevel = 100;
-		skyboxBlurBuffer.updateData("blurValue", &blurLevel, sizeof(int));
+		uint32_t blurLevel = 100;
+		setBlurLevel(blurLevel);
 
 		setTexture(_texture);
 	}
 
-	void SkyboxRenderer::render(GraphicsAPI* const api, const Camera& camera)
+	void SkyboxRenderer::render(GraphicsAPI* const api, const Framebuffer* renderingTarget)
 	{
 		if (texture == nullptr) {
 			return;
 		}
 
+		api->activateFramebuffer(renderingTarget);
 		api->enableSetting(GraphicsAPI::DepthTesting);
 		api->setDepthComparisonFunction(GraphicsAPI::LessOrEqual);
 		shader.activate();
-		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
-		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
 		texture->setForSampling(0);
 		api->render(mesh);
 	}
 
-    void SkyboxRenderer::setTexture(const Texture* _texture)
+    void SkyboxRenderer::setupCamera(const Camera &camera)
+    {
+		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
+		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
+    }
+
+    void SkyboxRenderer::setTexture(const Texture *_texture)
     {
 		if (_texture == nullptr)
 			return;
 
 		if (_texture->getDimensionality() != ITexture::Dimensionality::Cubemap)
 		{
-			Logger::getInstance().logErrorToConsole("Texture is not cubemap");
+			Logger::getInstance().logErrorToConsole("Texture is not of cubemap type");
 			return;
 		}
 
 		texture = _texture;
+    }
+
+    void SkyboxRenderer::setBlurLevel(uint32_t blur)
+    {
+		blur = glm::clamp(blur, 10U, 705U);
+		skyboxBlurBuffer.updateData("blurValue", &blur, sizeof(uint32_t));
     }
 }

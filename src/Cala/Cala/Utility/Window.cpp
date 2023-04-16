@@ -4,6 +4,7 @@
 #include "Window.h"
 #include "Platform.h"
 #include "Logger.h"
+#include "Cala/Rendering/GraphicsAPI.h"
 
 #if defined(CALA_PLATFORM_WINDOWS)
 	#define GLFW_EXPOSE_NATIVE_WIN32
@@ -18,14 +19,15 @@
 namespace Cala {
 	Window* Window::instance = nullptr;
 
-	Window::Window(const Specification& specification)
+	Window::Window(const Specification& specification) 
+		: windowName(specification.windowName),
+		  windowSize(specification.width, specification.height)
 	{
 		if (!glfwInit())
 			Logger::getInstance().logErrorToConsole("Failed to initialize GLFW!");
 
-		windowName = specification.windowName;
 		glfwWindowHint(GLFW_SAMPLES, specification.sampleCount);
-		windowHandle = glfwCreateWindow(specification.width, specification.height, windowName.c_str(), NULL, NULL);
+		windowHandle = glfwCreateWindow(windowSize.x, windowSize.y, windowName.c_str(), NULL, NULL);
 		if (!windowHandle)
 		{
 			glfwTerminate();
@@ -38,7 +40,8 @@ namespace Cala {
 		glfwSetWindowUserPointer(windowHandle, this);
 		ioSystem.reset(IOSystem::construct(windowHandle));
 
-		createContext();
+		glfwMakeContextCurrent(windowHandle);
+		GraphicsAPI::loadAPIFunctions();
 	}
 
 	Window* Window::construct(const Specification& specification)
@@ -56,20 +59,6 @@ namespace Cala {
 		glfwTerminate();
 	}
 
-
-	void Window::createContext() const
-	{
-	#if defined CALA_API_OPENGL
-		glfwMakeContextCurrent(windowHandle);
-
-		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-			Logger::getInstance().logErrorToConsole("Failed to initialize GLAD!");
-		}
-	#else
-		#error Api not supported yet!
-	#endif
-	}
-
 	void Window::update()
 	{
 		resized = false;
@@ -82,11 +71,9 @@ namespace Cala {
 		return glfwWindowShouldClose(windowHandle);
 	}
 
-	glm::ivec2 Window::getWindowSize() const
+	const glm::ivec2& Window::getWindowSize() const
 	{
-		int w, h;
-		glfwGetWindowSize(windowHandle, &w, &h);
-		return glm::ivec2(w, h);
+		return windowSize;
 	}
 
 	void* Window::getNativeWindowPointer() const
@@ -103,6 +90,8 @@ namespace Cala {
 	void Window::windowResizeCallback(GLFWwindow* window, int w, int h)
 	{
 		Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		win->windowSize.x = w;
+		win->windowSize.y = h;
 		win->resized = true;
 	}
 }

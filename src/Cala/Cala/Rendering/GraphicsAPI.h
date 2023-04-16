@@ -16,6 +16,7 @@ namespace Cala {
 		static GraphicsAPI* construct();
 		~GraphicsAPI();
 		static void _checkForErrors(const std::string& file, int line);
+		static void loadAPIFunctions();
 		void render(const Mesh& mesh) const;
 		void renderInstances(const Mesh& mesh, uint32_t drawCount) const;
 		void setBufferClearingColor(const glm::vec4& color) const;
@@ -24,9 +25,9 @@ namespace Cala {
 		glm::ivec4 getCurrentViewport() const;
 		void setRenderingPointSize(float size) const;
 		void clearFramebuffer() const;
-		void activateDefaultFramebuffer();
-		void activateFramebuffer(const Framebuffer& framebuffer);
-		const Framebuffer* getActiveFramebuffer() const { return activeFramebuffer; }
+
+		// nullptr activates default framebuffer
+		void activateFramebuffer(const Framebuffer* framebuffer);
 
 		enum Constant {
 			// GraphicsAPI settings
@@ -70,6 +71,6 @@ namespace Cala {
 		uint32_t mapConstant(Constant constant) const;
 		uint32_t bufferClearingBitmask;
 		static GraphicsAPI* instance;
-		const Framebuffer* activeFramebuffer = nullptr;
+		static bool apiFunctionsLoaded;
 	};
 }

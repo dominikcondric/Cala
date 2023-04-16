@@ -14,11 +14,16 @@ namespace Cala {
 		materialsBuffer.updateData("lightened", &lightened, sizeof(uint32_t));
 	}
 
-	void SimpleRenderer::render(GraphicsAPI* const api, const Camera& camera)
-	{
-		shader.activate();
+    void SimpleRenderer::setupCamera(const Camera &camera)
+    {
 		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
 		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
+    }
+
+    void SimpleRenderer::render(GraphicsAPI* const api, const Framebuffer* renderingTarget)
+	{
+		api->activateFramebuffer(renderingTarget);
+		shader.activate();
 
 		int lightened = 0;
 		materialsBuffer.updateData("lightened", &lightened, sizeof(int));

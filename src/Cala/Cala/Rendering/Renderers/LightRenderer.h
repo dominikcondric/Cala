@@ -1,17 +1,19 @@
 #pragma once 
-#include "IRenderer.h"
+#include "ICameraRenderer.h"
 #include "Cala/Rendering/Texture.h"
 #include "Cala/Utility/Transformation.h"
 #include "Cala/Rendering/Framebuffer.h"
+#include "Cala/Rendering/Shader.h"
 
 #define MAX_LIGHTS_COUNT 8
 
 namespace Cala {
-	class LightRenderer : public IRenderer {
+	class LightRenderer : public ICameraRenderer {
 	public:
 		LightRenderer(glm::uvec2 shadowMapDimensions = glm::uvec2(1024U));
 		~LightRenderer() override = default;
-		void render(GraphicsAPI* const api, const Camera& camera) override;
+		void render(GraphicsAPI* const api, const Framebuffer* renderingTarget) override;
+		void setupCamera(const Camera& camera) override;
 
 		struct Renderable {
 			Renderable(const Mesh& _mesh, const Transformation& _transformation, const glm::vec4& _color,

@@ -7,7 +7,7 @@
 ### Requirements:
 * C++ toolchain
 * Modern CMake (version 3.0.0 or higher)
-* OpenGL 3.3 or higher
+* OpenGL 4.3 or higher
 
 ### Cloning:
 Cala is using git submodules so first clone the repository with:
@@ -24,7 +24,7 @@ cd build
 cmake ..
 ```
 
-In case you don't want to build demo, set *BUILD_DEMO* option to *OFF*.
+In case you don't want to build demo, set *BUILD_CALA_DEMO* option to *OFF*.
 
 *\* If you want to use different build system than the one chosen by CMake, use -G flag with build system in quotes (You can find the list of supported build systems using cmake --help).*
 

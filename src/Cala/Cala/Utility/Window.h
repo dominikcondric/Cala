@@ -28,19 +28,19 @@ namespace Cala {
 		bool exitTriggered() const;
 		bool isResized() const { return resized; }
 		const IOSystem& getIO() const { return *ioSystem.get(); }
-		glm::ivec2 getWindowSize() const;
-		GLFWwindow* const getWindowPointer() const { return windowHandle; }
+		const glm::ivec2& getWindowSize() const;
+		GLFWwindow* getWindowPointer() { return windowHandle; }
 		void* getNativeWindowPointer() const;
 
 	private:
 		Window(const Specification& specification);
 		static void windowResizeCallback(GLFWwindow* window, int w, int h);
-		void createContext() const;
 
 		std::unique_ptr<IOSystem> ioSystem;
 		GLFWwindow* windowHandle = nullptr;
 		std::string windowName;
 		bool resized = false;
 		static Window* instance;
+		glm::ivec2 windowSize;
 	};
 }

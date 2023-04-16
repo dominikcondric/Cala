@@ -17,24 +17,37 @@ namespace Cala {
 		transformation.scale(glm::vec3((float)gridSize));
 	}
 
-	void HelperGridRenderer::render(GraphicsAPI* const api, const Camera& camera)
-	{
-		shader.activate();
+    void HelperGridRenderer::setupCamera(const Camera &camera)
+    {
 		mvpBuffer.updateData("projection", &camera.getProjection()[0][0], sizeof(glm::mat4));
 		mvpBuffer.updateData("view", &camera.getView()[0][0], sizeof(glm::mat4));
-		const int lightened = 0;
-		meshDataBuffer.updateData("lightened", &lightened, sizeof(int));
-		meshDataBuffer.updateData("material.color", &color, sizeof(glm::vec4));
 
-		const float distance = glm::floor(glm::length(camera.getPosition()));
-		if (distance != updateDistance)
+		if (moveXZWithCamera)
 		{
-			updateDistance = distance;
 			transformation.translate(glm::vec3(glm::floor(camera.getPosition().x), 0.f, glm::floor(camera.getPosition().z)) - transformation.getTranslation());
 		}
+    }
 
+    void HelperGridRenderer::setMoveXZWithCamera(bool move)
+    {
+		moveXZWithCamera = move;
+		if (!move)
+		{
+			transformation.translate(-transformation.getTranslation());
+		}
+    }
+
+    void HelperGridRenderer::render(GraphicsAPI* const api, const Framebuffer* renderingTarget)
+	{
+		api->activateFramebuffer(renderingTarget);
+		shader.activate();
+		api->enableSetting(GraphicsAPI::DepthTesting);
+		const int lightened = 0;
+		meshDataBuffer.updateData("lightened", &lightened, sizeof(int));
+		meshDataBuffer.updateData("material.color", &gridColor, sizeof(glm::vec4));
 		mvpBuffer.updateData("model", &transformation.getTransformMatrix()[0][0], sizeof(glm::mat4));
 		api->render(gridMesh);
+		api->disableSetting(GraphicsAPI::DepthTesting);
 	}
 }
 

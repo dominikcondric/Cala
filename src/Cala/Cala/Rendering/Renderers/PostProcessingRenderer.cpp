@@ -66,14 +66,14 @@ namespace Cala {
 
 		// Setup offscreen framebuffer
 		sceneViewport = api->getCurrentViewport();
-		api->activateFramebuffer(helperFramebuffers[0]);
+		api->activateFramebuffer(&helperFramebuffers[0]);
 		api->clearFramebuffer();
 		api->setViewport({ 0, 0, framebufferTargetsSize.x, framebufferTargetsSize.y });
 
 		beginCalled = true;
 	}
 
-	void PostProcessingRenderer::render(GraphicsAPI* api, const Camera& camera)
+	void PostProcessingRenderer::render(GraphicsAPI* api, const Framebuffer* renderingTarget)
 	{
 		if (!beginCalled)
 		{
@@ -103,7 +103,7 @@ namespace Cala {
 			applyEffect(api, effect, value);
 
 		effects.clear();
-		api->activateDefaultFramebuffer();
+		api->activateFramebuffer(renderingTarget);
 		api->setViewport(sceneViewport);
 		uint32_t effect = Copy;
 		effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));
@@ -130,17 +130,17 @@ namespace Cala {
 				if (effect == PostProcessingEffect::Bloom)
 					applyBloom(api, (int)effectValue);
 
-				api->activateFramebuffer(fb1);
+				api->activateFramebuffer(&fb1);
 				fb0.getColorTarget(0).setForSampling(0);
 				currentFB = 1;
 				break;
 			case 1:
-				api->activateFramebuffer(fb0);
+				api->activateFramebuffer(&fb0);
 				fb1.getColorTarget(0).setForSampling(0);
 				currentFB = 0;
 				break;
 			case 2:
-				api->activateFramebuffer(fb0);
+				api->activateFramebuffer(&fb0);
 				fb2.getColorTarget(0).setForSampling(0);
 				currentFB = 0;
 				break;
@@ -156,7 +156,7 @@ namespace Cala {
 		const Framebuffer& fb1 = helperFramebuffers[1];
 		const Framebuffer& fb2 = helperFramebuffers[2];
 
-		api->activateFramebuffer(fb2);
+		api->activateFramebuffer(&fb2);
 		helperFramebuffers[currentFB].getColorTarget(0).setForSampling(0);
 		uint32_t effect = HelperPostProcessingEffect::Extract;
 		effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));
@@ -164,13 +164,13 @@ namespace Cala {
 
 		for (int i = 0; i < bloomIntensity; ++i)
 		{
-			api->activateFramebuffer(fb1);
+			api->activateFramebuffer(&fb1);
 			fb2.getColorTarget(0).setForSampling(0);
 			effect = HelperPostProcessingEffect::HorizontalGaussianBlur;
 			effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));
 			api->render(renderingQuad);
 
-			api->activateFramebuffer(fb2);
+			api->activateFramebuffer(&fb2);
 			fb1.getColorTarget(0).setForSampling(0);
 			effect = HelperPostProcessingEffect::VerticalGaussianBlur;
 			effectsBuffer.updateData("effect", &effect, sizeof(uint32_t));

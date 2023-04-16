@@ -13,9 +13,8 @@ public:
 private:
 	void loop() override;
 
-	Mesh sphereMesh, cubeMesh, planeMesh;
-	Transformation planeTransform;
-	std::array<Transformation, 4> wallTransforms;
+	Mesh sphereMesh, cubeMesh;
+	std::array<Transformation, 5> wallTransforms;
 	SimpleRenderer simpleRenderer;
 	LightRenderer lightRenderer;
 	std::vector<LightRenderer::Renderable> cubeRenderables;

@@ -1,6 +1,5 @@
 #pragma once 
 #include "Cala/Rendering/GraphicsAPI.h"
-#include "Cala/Rendering/Shader.h"
 #include "Cala/Rendering/Camera.h"
 
 namespace Cala {
@@ -8,6 +7,6 @@ namespace Cala {
 	public:
 		IRenderer() = default;
 		virtual ~IRenderer() = default;
-		virtual void render(GraphicsAPI* const api, const Camera& camera) = 0;
+		virtual void render(GraphicsAPI* const api, const Framebuffer* renderingTarget) = 0;
 	};
 }
