@@ -66,6 +66,7 @@ namespace Cala {
         // virtual void attachToFramebuffer(Framebuffer& framebuffer) = 0;
 		glm::ivec2 getDimensions() const { return glm::ivec2(width, height); }
 		void setForSampling(uint32_t bindingIndex) const;
+		void free();
 		bool isWriteOnly() const { return writeOnly; }
 		bool isDepth() const;
 		bool isColor() const;

@@ -38,7 +38,6 @@ namespace Cala {
 
 		effectsBuffer.setData(shader.getConstantBufferInfo("EffectValues"), true);
 
-		Model quadModel;
 		std::vector<float> renderingQuadVertices = {
 			-1.f, 1.f, 0.f, 1.f,
 			-1.f, -1.f, 0.f, 0.f,
@@ -47,11 +46,11 @@ namespace Cala {
 		};
 
 		std::vector<Model::VertexLayoutSpecification> modelLayouts;
-		modelLayouts.push_back({ 0, 2, 4 * sizeof(float), 0, 1 });
-		modelLayouts.push_back({ 1, 2, 4 * sizeof(float), 2 * sizeof(float), 1 });
+		modelLayouts.push_back({ 0, 2, 4 * sizeof(float), 0, 0 });
+		modelLayouts.push_back({ 1, 2, 4 * sizeof(float), 2 * sizeof(float), 0 });
 
-		quadModel.loadCustomModel(renderingQuadVertices, 4, {}, modelLayouts, Model::DrawingMode::TriangleStrip);
-		renderingQuad.loadFromModel(quadModel, false, false);
+		renderingQuad.setVertexBufferData(renderingQuadVertices, 4, modelLayouts, false);
+		renderingQuad.setDrawingMode(Model::DrawingMode::TriangleStrip);
 
 		effects.reserve(5);
 	}

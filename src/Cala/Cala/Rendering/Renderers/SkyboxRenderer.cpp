@@ -5,7 +5,6 @@ namespace Cala {
 	SkyboxRenderer::SkyboxRenderer(const Texture* _texture)
 	{
 		mesh.loadFromModel(Model().loadCube(), false, false);
-		mesh.culled = false;
 		std::filesystem::path shadersDir(SHADERS_DIR);
 		shader.attachShader(Shader::ShaderType::VertexShader, shadersDir / "SkyboxVertexShader.glsl");
 		shader.attachShader(Shader::ShaderType::FragmentShader, shadersDir / "SkyboxFragmentShader.glsl");

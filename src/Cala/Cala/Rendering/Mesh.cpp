@@ -5,16 +5,14 @@
 
 namespace Cala {
 #ifdef CALA_API_OPENGL
-	Mesh::Mesh(const Model& model, bool dynamic, bool _culled)
+	Mesh::Mesh(const Model& model, bool dynamic, bool _cullingEnabled)
 	{
-		loadFromModel(model, dynamic, _culled);
+		loadFromModel(model, dynamic, _cullingEnabled);
 	}
 
 	Mesh::~Mesh()
 	{
-		glDeleteBuffers(1, &vbo);
-		glDeleteBuffers(1, &ebo);
-		glDeleteVertexArrays(1, &vao);
+		free();
 	}
 
 	Mesh::Mesh(Mesh&& other) noexcept
@@ -36,14 +34,25 @@ namespace Cala {
 		return *this;
 	}
 
-	void Mesh::loadFromModel(const Model& model, bool dynamic, bool _culled)
+    void Mesh::free()
+    {
+		glDeleteBuffers(1, &vbo);
+		glDeleteBuffers(1, &ebo);
+		glDeleteVertexArrays(1, &vao);
+
+		vbo = GL_NONE;
+		ebo = GL_NONE;
+		vao = GL_NONE;
+    }
+
+    void Mesh::loadFromModel(const Model& model, bool dynamic, bool _cullingEnabled)
 	{
-		setVertexBufferData(model.getVertexData(), model.getVertexCount(), model.getLayoutSpecification(), dynamic);
-		if (model.getIndexCount() != 0)
-			setIndexBufferData(model.getIndexData(), dynamic);
+		setVertexBufferData(model.getGPUVertexData(), model.getPositions().size(), model.getLayoutSpecification(), dynamic);
+		if (model.getIndices().size() != 0)
+			setIndexBufferData(model.getIndices(), dynamic);
 
 		setDrawingMode(model.getDrawingMode());
-		culled = _culled;
+		cullingEnabled = _cullingEnabled;
 	}
 
 	void Mesh::setVertexBufferData(const float* data, uint32_t arraySize, uint32_t _vertexCount, const std::vector<Model::VertexLayoutSpecification>& layouts, bool isDynamic)

@@ -183,7 +183,7 @@ namespace Cala {
 
 	void GraphicsAPI::render(const Mesh& mesh) const
 	{
-		if (mesh.culled)
+		if (mesh.cullingEnabled)
 			enableSetting(FaceCulling);
 		else 
 			disableSetting(FaceCulling);

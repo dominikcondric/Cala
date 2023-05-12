@@ -21,6 +21,7 @@ set(src_files
     Utility/Image.h                 Utility/Image.cpp
     Utility/Time.h                 Utility/Time.cpp
     Utility/Model.h                 Utility/Model.cpp
+    Utility/ModelLoader.h                 Utility/ModelLoader.cpp
     Utility/Window.h                Utility/Window.cpp
     Utility/IOSystem.h              Utility/IOSystem.cpp
     Utility/Transformation.h        Utility/Transformation.cpp

@@ -1,5 +1,7 @@
 #include "DemoApplication.h"
 #include <glm/gtc/random.hpp>
+#include "Cala/Utility/ModelLoader.h"
+#include <iostream>
 
 #define LIGHT_MOVE 10.f * time.deltaTime
 

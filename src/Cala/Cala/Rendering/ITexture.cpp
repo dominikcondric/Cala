@@ -7,10 +7,7 @@ namespace Cala {
     #include <glad/glad.h>
     ITexture::~ITexture()
     {
-        if (writeOnly)
-            glDeleteRenderbuffers(1, &textureHandle);
-        else
-            glDeleteTextures(1, &textureHandle);
+       free();
     }
 
     ITexture::ITexture(ITexture&& other) noexcept
@@ -40,6 +37,16 @@ namespace Cala {
 
         glActiveTexture(GL_TEXTURE0 + bindingIndex);
         glBindTexture(nativeType, textureHandle);
+    }
+
+    void ITexture::free()
+    {
+        if (writeOnly)
+            glDeleteRenderbuffers(1, &textureHandle);
+        else
+            glDeleteTextures(1, &textureHandle);
+
+        textureHandle = GL_NONE;
     }
 
     bool ITexture::isDepth() const
@@ -73,7 +80,7 @@ namespace Cala {
                 break;
             case Format::RGBA:
                 internalFormat = GL_RGBA;
-                format = GL_RGB;
+                format = GL_RGBA;
                 dataType = GL_UNSIGNED_BYTE;
                 break;
             case Format::GAMMA_RGBA:
@@ -83,7 +90,7 @@ namespace Cala {
                 break;
             case Format::FLOAT_RGBA:
                 internalFormat = GL_RGBA32F;
-                format = GL_RGB;
+                format = GL_RGBA;
                 dataType = GL_FLOAT;
                 break;
             case Format::DEPTH16:

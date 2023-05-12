@@ -2,6 +2,7 @@
 #include "Cala/Utility/BaseApplication.h"
 #include "Cala/Rendering/Renderers/LightRenderer.h"
 #include "Cala/Rendering/Renderers/SimpleRenderer.h"
+#include "Cala/Rendering/Renderers/PostProcessingRenderer.h"
 
 using namespace Cala;
 
