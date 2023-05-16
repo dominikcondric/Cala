@@ -14,6 +14,8 @@ namespace Cala {
 		~LightRenderer() override = default;
 		void render(GraphicsAPI* const api, const Framebuffer* renderingTarget) override;
 		void setupCamera(const Camera& camera) override;
+		void enableCelShading(uint32_t levelCount) { celShadingLevelCount = levelCount; }
+		void disableCelShading() { celShadingLevelCount = 0; }
 
 		struct Renderable {
 			Renderable(const Mesh& _mesh, const Transformation& _transformation, const glm::vec4& _color,
@@ -29,7 +31,7 @@ namespace Cala {
 			~Renderable() = default;
 
 			const Mesh& mesh;
-			const Transformation& transformation;
+			Transformation transformation;
 			glm::vec4 color;
 			const Texture* diffuseMap = nullptr;
 			const Texture* specularMap = nullptr;
@@ -57,7 +59,7 @@ namespace Cala {
 			Type type = Type::Point;
 			float intensity = 1.f;
 			glm::vec3 color{ 1.f };
-			const Transformation& transformation;
+			Transformation transformation;
 			float spotlightCutoff = 90.f;
 			bool shadowCaster = true;
 		};
@@ -68,6 +70,9 @@ namespace Cala {
 
     private:
         void updateLight(const Light &light, uint32_t lightIndex);
+
+	private:
+        uint32_t celShadingLevelCount = 0;
 		std::vector<Renderable> renderables[8];
 		std::vector<Light> lights;
 		Shader mainShader;

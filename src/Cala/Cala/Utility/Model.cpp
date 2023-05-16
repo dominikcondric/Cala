@@ -179,9 +179,9 @@ namespace Cala {
 	}
 
     Model& Model::loadCustomModel(const std::vector<glm::vec3>& _positions, const std::vector<glm::vec3>& _normals, const std::vector<glm::vec2>& _textureCoordinates,
-		 const std::vector<uint32_t>& _indices, DrawingMode _drawingMode)
+		 const std::vector<uint32_t>& _indices, DrawingMode _drawingMode, const std::string& name)
 	{
-		path = "custom";
+		path = name;
 		positions = _positions;
 		normals = _normals;
 		textureCoordinates = _textureCoordinates;

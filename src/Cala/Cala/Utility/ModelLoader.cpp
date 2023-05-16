@@ -42,7 +42,7 @@ void Cala::ModelLoader::loadFromObj(const std::filesystem::path &modelPath)
             if (modelCompleted)
             {
                 modelCompleted = false;
-                models.emplace_back(generateGPUVertexDataOnLoad).loadCustomModel(positions, alignedNormals, alignedTextureCoordinates, indices, Model::DrawingMode::Triangles);
+                models.emplace_back(generateGPUVertexDataOnLoad).loadCustomModel(positions, alignedNormals, alignedTextureCoordinates, indices, Model::DrawingMode::Triangles, modelName);
                 positionsOffset += positions.size();
                 texCoordsOffset += textureCoordinates.size();
                 normalsOffset += normals.size();
@@ -126,7 +126,7 @@ void Cala::ModelLoader::loadFromObj(const std::filesystem::path &modelPath)
     }
 
     modelCompleted = false;
-    models.emplace_back(generateGPUVertexDataOnLoad).loadCustomModel(positions, alignedNormals, alignedTextureCoordinates, indices, Model::DrawingMode::Triangles);
+    models.emplace_back(generateGPUVertexDataOnLoad).loadCustomModel(positions, alignedNormals, alignedTextureCoordinates, indices, Model::DrawingMode::Triangles, modelName);
     positionsOffset += positions.size();
     texCoordsOffset += textureCoordinates.size();
     normalsOffset += normals.size();

@@ -82,6 +82,11 @@ void generateDirectionalSpotlightShadowMaps(const Light light)
 	gl_Layer++;
 }
 
+bool isPoint(const Light light)
+{
+	return light.cutoff < -1.5f;
+}
+
 void main()
 {
 	gl_Layer = 0;
@@ -90,7 +95,7 @@ void main()
 		if (lights[i].projection == mat4(0.f))
 			continue;
 
-		if (lights[i].constant > 1.f)
+		if (isPoint(lights[i]))
 			generatePointShadowMaps(lights[i]);
 		else
 			generateDirectionalSpotlightShadowMaps(lights[i]);

@@ -17,7 +17,7 @@ namespace Cala {
 				mesh(_mesh), transformation(_transformation), color(_color) {}
 
 			const Mesh& mesh;
-			const Transformation& transformation;
+			Transformation transformation;
 			glm::vec4 color;
 		};
 

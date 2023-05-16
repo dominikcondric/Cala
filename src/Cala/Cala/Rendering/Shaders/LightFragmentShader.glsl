@@ -38,6 +38,7 @@ layout (binding = 4) uniform LightsData
 	Light lights[MAX_LIGHTS_COUNT];
 	uint lightSourceCount;
 	bool shadows;
+	uint celShadingLevelCount;
 };
 
 layout (binding = 2) uniform MeshData
@@ -167,14 +168,11 @@ float shadowFactor(const Light light, out uint shadowMapCounter)
 	lightViewPosition = lightViewPositionClip.xyz / lightViewPositionClip.w;
 	lightViewPosition = lightViewPosition * 0.5f + 0.5f;
 
-	float shadow = 0.f;
-	vec3 lightDirection = normalize(light.position - inAttributes.fragPosition);
-	float bias = max(0.05f * (1.0f - dot(normal, lightDirection)), 0.005f);
-    float currentDepth = lightViewPosition.z;
+    const float currentDepth = lightViewPosition.z;
 	if (currentDepth >= 1.f)
         return 0.f;
 
-    shadow = texture(shadowMaps, vec4(lightViewPosition.xy, shadowMapIndex, currentDepth - bias));
+    float shadow = texture(shadowMaps, vec4(lightViewPosition.xy, shadowMapIndex, currentDepth));
 
 	// PCF
 	/* vec2 texelSize = 1.f / textureSize(shadowMaps, 0).xy;
@@ -190,7 +188,17 @@ float shadowFactor(const Light light, out uint shadowMapCounter)
 	shadow /= 9.f; */
 
     return shadow;
-}  
+}
+
+float getCelShadingFactor(float factor)
+{
+	const float threshold = 1.f / (celShadingLevelCount - 1);
+	for (uint i = 0; i <= celShadingLevelCount; ++i)
+	{
+		if (abs(factor - threshold * i) <= threshold / 2)
+			return i * threshold;
+	}
+}
 
 vec3 calculatePointLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout vec3 colorSpecular, inout vec3 eyeDirection, const Light light, out uint shadowMapCounter) 
 {
@@ -199,14 +207,20 @@ vec3 calculatePointLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, inout
 
 	// diffuse
 	vec3 lightDirection = normalize(light.position - inAttributes.fragPosition);
-	float lightAngle = dot(lightDirection, normal);
-	lightAngle = max(lightAngle, 0.0);
-	vec3 diffuseComponent = colorDiffuse * light.color * lightAngle;
+	float lightAngle = max(dot(lightDirection, normal), 0.0f);
 
 	// specular
 	// vec3 reflectedLight = reflect(-lightDirection, normal);
 	vec3 halfwayVector = normalize(lightDirection + eyeDirection);
 	float eyeAngle = pow(max(dot(halfwayVector, normal), 0.0), material.shininess);
+
+	if (celShadingLevelCount != 0)
+	{
+		lightAngle = getCelShadingFactor(lightAngle);
+		eyeAngle = getCelShadingFactor(eyeAngle);
+	}
+
+	vec3 diffuseComponent = colorDiffuse * light.color * lightAngle;
 	vec3 specularComponent = colorSpecular * light.color * eyeAngle;
 		
 	vec3 result = ambientComponent + ((diffuseComponent + specularComponent) * attenuation(light) * (1.f - shadowFactor(light, shadowMapCounter)));
@@ -221,14 +235,20 @@ vec3 calculateDirectionalLight(inout vec3 colorAmbient, inout vec3 colorDiffuse,
 
 	// diffuse
 	vec3 lightDirection = normalize(-light.direction);
-	float lightAngle = dot(lightDirection, normal);
-	lightAngle = max(lightAngle, 0.0);
-	vec3 diffuseComponent = colorDiffuse * light.color * lightAngle;
+	float lightAngle = max(dot(lightDirection, normal), 0.0f);
 
 	// specular
 	// vec3 reflectedLight = reflect(-lightDirection, normal);
 	vec3 halfwayVector = normalize(lightDirection + eyeDirection);
-	float eyeAngle = pow(max(dot(halfwayVector, normal), 0.0), 3 * material.shininess);
+	float eyeAngle = pow(max(dot(halfwayVector, normal), 0.0f), material.shininess);
+
+	if (celShadingLevelCount != 0)
+	{
+		lightAngle = getCelShadingFactor(lightAngle);
+		eyeAngle = getCelShadingFactor(eyeAngle);
+	}
+
+	vec3 diffuseComponent = colorDiffuse * light.color * lightAngle;
 	vec3 specularComponent = colorSpecular * light.color * eyeAngle;
 		
 	vec3 result = ambientComponent + (diffuseComponent + specularComponent) * (1.f - shadowFactor(light, shadowMapCounter));
@@ -250,16 +270,21 @@ vec3 calculateSpotlightLight(inout vec3 colorAmbient, inout vec3 colorDiffuse, i
 	if (theta < outerCutOff) 
 		return ambientComponent;
 
-	float lightAngle = dot(lightDirection, normal);
-	lightAngle = max(lightAngle, 0.0);
-	vec3 diffuseComponent = colorDiffuse * light.color * lightAngle;
+	float lightAngle = max(dot(lightDirection, normal), 0.f);
 
 	// specular
 	// vec3 reflectedLight = reflect(-lightDirection,inAttributes. normal);
 	vec3 halfwayVector = normalize(lightDirection + eyeDirection);
-	float eyeAngle = pow(max(dot(halfwayVector, normal), 0.0), 3 * material.shininess);
-	vec3 specularComponent = colorSpecular * light.color * eyeAngle;
+	float eyeAngle = pow(max(dot(halfwayVector, normal), 0.0), material.shininess);
 
+	if (celShadingLevelCount != 0)
+	{
+		lightAngle = getCelShadingFactor(lightAngle);
+		eyeAngle = getCelShadingFactor(eyeAngle);
+	}
+
+	vec3 diffuseComponent = colorDiffuse * light.color * lightAngle;
+	vec3 specularComponent = colorSpecular * light.color * eyeAngle;
 	float intensity = clamp((theta - outerCutOff) / epsilon, 0.0, 1.0);
 	vec3 result = ambientComponent + ((diffuseComponent + specularComponent) * intensity * attenuation(light) * (1.f - shadowFactor(light, shadowMapCounter)));
 

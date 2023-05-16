@@ -41,10 +41,9 @@ namespace Cala {
 		Model& loadCube(const glm::vec3& minBound = glm::vec3(-0.5f), const glm::vec3& maxBound = glm::vec3(0.5f));
 		Model& loadPlane(const glm::vec3& minBound = glm::vec3(-0.5f, 0.f, -0.5f), const glm::vec3& maxBound = glm::vec3(0.5f, 0.f, 0.5f));
 		Model& loadRay(const glm::vec3& rayOrigin = glm::vec3(0.f), const glm::vec3& rayDirection = glm::vec3(0.f, 0.f, 1.f), const float t = 10.f);
-		Model& loadCustomModel(const std::vector<glm::vec3>& _positions, const std::vector<glm::vec3>& _normals, const std::vector<glm::vec2>& _textureCoordinates,
-		 const std::vector<uint32_t>& _indices, DrawingMode _drawingMode);
+        Model &loadCustomModel(const std::vector<glm::vec3> &_positions, const std::vector<glm::vec3> &_normals, const std::vector<glm::vec2> &_textureCoordinates, const std::vector<uint32_t> &_indices, DrawingMode _drawingMode, const std::string &name);
 
-	private:
+    private:
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> textureCoordinates;

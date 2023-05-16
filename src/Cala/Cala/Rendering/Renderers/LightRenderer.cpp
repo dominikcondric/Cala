@@ -90,13 +90,13 @@ namespace Cala {
 				linear = 0.f;
 				quadratic = 0.f;
 				cutoff = -3.f;
-				projection = glm::ortho(-20.f, 20.f, -20.f, 20.f, 1.f, 30.f);
+				projection = glm::ortho(-50.f, 50.f, -50.f, 50.f, 1.f, 100.f);
 				break;
 			}
 			case Light::Type::Spotlight:
 			{
 				color = light.intensity * light.color;
-				direction = glm::vec4(glm::vec3(light.transformation.getRotationMatrix() * glm::vec4(0.f, -1.f, 0.f, 0.f)), 0.f);
+				direction = glm::vec3(light.transformation.getRotationMatrix() * glm::vec4(0.f, -1.f, 0.f, 0.f));
 				constant = 1.f;
 				linear = 0.045f;
 				quadratic = 0.0075f;
@@ -131,6 +131,7 @@ namespace Cala {
     {
 		int shadowsInt = shadows;
 		lightsBuffer.updateData("shadows", &shadowsInt, sizeof(shadowsInt));
+		lightsBuffer.updateData("celShadingLevelCount", &celShadingLevelCount, sizeof(uint32_t));
 
 		auto currentViewport = api->getCurrentViewport();
 

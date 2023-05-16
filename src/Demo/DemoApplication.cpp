@@ -1,7 +1,5 @@
 #include "DemoApplication.h"
 #include <glm/gtc/random.hpp>
-#include "Cala/Utility/ModelLoader.h"
-#include <iostream>
 
 #define LIGHT_MOVE 10.f * time.deltaTime
 
@@ -13,9 +11,10 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube())
 	camera.setPosition(glm::vec3(0.f, 40.f, 25.f));
 
 	// Reserves are VERY important for memory consistency (references!!!)
-	transformations.reserve(100);
-	cubeRenderables.reserve(100);
-	for (int i = 0; i < 100; ++i) {
+	const uint32_t CUBES_COUNT = 30;
+	transformations.reserve(CUBES_COUNT);
+	cubeRenderables.reserve(CUBES_COUNT);
+	for (int i = 0; i < CUBES_COUNT; ++i) {
 		Transformation transformation;
 		glm::vec2 diskRand = glm::diskRand(19.f);
 		transformation.scale(glm::linearRand(0.5f, 2.f)).translate(glm::vec3(diskRand.x, glm::linearRand(4.f, 8.f), diskRand.y));
@@ -34,7 +33,7 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube())
 	wallTransforms[4].scale(glm::vec3(40.f, 1.f, 40.f)); // Left wall
 
 	glm::vec2 rand = glm::diskRand(10.f);
-	lightTransformation.translate(glm::vec3(rand.x, 7.f, rand.y)).scale(0.2f);
+	lightTransformation.translate(glm::vec3(rand.x, 20.f, rand.y)).scale(0.2f);
 
 	api->setBufferClearingColor(glm::vec4(glm::vec3(0.1f), 1.f));
 }
