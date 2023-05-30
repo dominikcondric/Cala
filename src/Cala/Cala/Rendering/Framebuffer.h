@@ -5,9 +5,10 @@
 #include "Texture.h"
 #include "TextureArray.h"
 #include "NativeAPI.h"
+#include "GPUResource.h"
 
 namespace Cala {
-	class Framebuffer {
+	class Framebuffer : public GPUResource {
 	public:
 		Framebuffer() = default;
 		~Framebuffer();
@@ -17,6 +18,8 @@ namespace Cala {
 		Framebuffer& operator=(Framebuffer&& other) noexcept;
 		void addColorTarget(Texture* target, bool transferOwnership);
 		void addDepthTarget(Texture* target, bool transferOwnership);
+		void free() override;
+		bool isLoaded() const override;
 
 		/**
 		 * Adds color target to a framebuffer

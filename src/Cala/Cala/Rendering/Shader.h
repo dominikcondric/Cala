@@ -4,11 +4,11 @@
 #include <vector>
 #include "ConstantBuffer.h"
 #include <filesystem>
-
-typedef uint32_t GLuint;
+#include "NativeAPI.h"
+#include "GPUResource.h"
 
 namespace Cala {
-	class Shader {
+	class Shader : public GPUResource {
 	public:
 		enum class ShaderType {
 			VertexShader = 0,
@@ -24,6 +24,8 @@ namespace Cala {
 		Shader(Shader&& other) noexcept;
 		Shader& operator=(const Shader& other) = delete;
 		Shader& operator=(Shader&& other) noexcept;
+		void free() override;
+		bool isLoaded() const override;
 		void activate() const;
 		void attachShader(ShaderType type, const std::filesystem::path& filePath);
 		void createProgram();

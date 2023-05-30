@@ -1,5 +1,6 @@
 #include "TextureArray.h"
 #include "GraphicsAPI.h"
+#include "Cala/Utility/Logger.h"
 
 namespace Cala {
 #ifdef CALA_API_OPENGL
@@ -20,6 +21,12 @@ namespace Cala {
 
     void TextureArray::load(const Specification &specification, uint32_t _mipmapCount, uint32_t _layerCount)
     {
+        if (isLoaded())
+        {
+            Logger::getInstance().logErrorToConsole("Texture already loaded!");
+            return;
+        }
+
         initializeData(specification);
 
         if (_mipmapCount == 0)
@@ -27,9 +34,8 @@ namespace Cala {
         mipmapCount = _mipmapCount;
         layerCount = _layerCount;
 
-        if (textureHandle == API_NULL)
-            glGenTextures(1, &textureHandle);
-
+        
+        glGenTextures(1, &textureHandle);
         switch (dimensionality)
         {
             case Dimensionality::OneDimensional:

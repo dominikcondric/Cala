@@ -4,9 +4,10 @@
 #include <string>
 #include "Cala/Utility/Model.h"
 #include "NativeAPI.h"
+#include "GPUResource.h"
 
 namespace Cala {
-	class Mesh {
+	class Mesh : public GPUResource {
 	public:
 		Mesh(const Model& model, bool dynamic = false, bool _cullingEnabled = true);
 		Mesh() = default;
@@ -15,6 +16,7 @@ namespace Cala {
 		Mesh(Mesh&& other) noexcept;
 		Mesh& operator=(const Mesh& other) = delete;
 		Mesh& operator=(Mesh&& other) noexcept;
+		bool isLoaded() const;
 		void free();
 		void loadFromModel(const Model& model, bool dynamic = false, bool _cullingEnabled = true);
 		void setIndexBufferData(const uint32_t* data, uint32_t arraySize, bool isDynamic = false);

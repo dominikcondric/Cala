@@ -34,6 +34,7 @@ namespace Cala {
 		const std::vector<float>& getGPUVertexData() const { return gpuVertexData; }
 		DrawingMode getDrawingMode() const { return drawingMode; }
 		const std::string& getModelPath() const { return path; }
+		const std::string& getModelName() const { return name; }
 		void removeReduntantPositions();
 
 		void createGPUVertexData(uint32_t positionIndex = 0, uint32_t normalsIndex = 1, uint32_t texCoordsIndex = 2, uint32_t tangentsIndex = 3);

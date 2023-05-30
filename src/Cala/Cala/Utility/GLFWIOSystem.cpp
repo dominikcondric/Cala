@@ -1,75 +1,19 @@
-#include "IOSystem.h"
+#include "IIOSystem.h"
 #include <GLFW/glfw3.h>
+#include "GLFWIOSystem.h"
 
 namespace Cala {
-	IOSystem* IOSystem::instance = nullptr;
-
-	IOSystem::IOSystem(GLFWwindow* windowPointer) : windowHandle(windowPointer)
-	{
-		keyStates.reserve(100);
-		for (uint32_t i = 0; i < 100; ++i)
-			keyStates.push_back(false);
-	}
-
-    IOSystem *IOSystem::construct(GLFWwindow* windowPointer)
+    GLFWIOSystem::GLFWIOSystem(GLFWwindow* _windowHandle) : windowHandle(_windowHandle)
     {
-        if (!instance)
-			return instance = new IOSystem(windowPointer);
-
-		return instance;
     }
 
-    IOSystem::~IOSystem()
+    void GLFWIOSystem::update()
     {
-		instance = nullptr;
+        glfwPollEvents();
+        IIOSystem::update();
     }
 
-    void IOSystem::update()
-    {
-		lastX = cursorX;
-		lastY = cursorY;
-		glfwGetCursorPos(windowHandle, &cursorX, &cursorY);
-
-		for (uint32_t i = 0; i < keyStates.size(); ++i)
-			keyStates[i] = isKeyPressed((KeyCode)i);
-
-		glfwPollEvents();
-	}
-
-	bool IOSystem::isKeyPressed(KeyCode key) const
-	{
-		return bool(glfwGetKey(windowHandle, mapEngineToLibraryKey(key)));
-	}
-
-	bool IOSystem::isKeyTapped(KeyCode key) const
-	{
-		return (isKeyPressed(key) && !keyStates[(int)key]);
-	}
-
-	bool IOSystem::isMouseButtonPressed(KeyCode button) const
-	{
-		return bool(glfwGetMouseButton(windowHandle, mapEngineToLibraryKey(button)));
-	}
-
-	bool IOSystem::isMouseButtonTapped(KeyCode button) const
-	{
-		return bool(isMouseButtonPressed(button) && !keyStates[(int)button]);
-	}
-
-	glm::vec2 IOSystem::getCursorPosition() const
-	{
-		return glm::vec2(cursorX, cursorY);
-	}
-
-	glm::vec2 IOSystem::getCursorOffset() const
-	{
-		glm::vec2 cursorOff;
-		cursorOff.x = (float)cursorX - (float)lastX;
-		cursorOff.y = (float)lastY - (float)cursorY;
-		return cursorOff;
-	}
-
-	constexpr IOSystem::LibraryCode IOSystem::calculate(LibraryCode code, LibraryCode code1, LibraryCode code2, char op) const
+    constexpr GLFWIOSystem::LibraryCode GLFWIOSystem::calculate(LibraryCode code, LibraryCode code1, LibraryCode code2, char op) const
 	{
 		switch (op)
 		{
@@ -84,7 +28,7 @@ namespace Cala {
 		return -1;
 	}
 
-	constexpr IOSystem::LibraryCode IOSystem::mapLibraryToEngineKey(LibraryCode code) const
+	constexpr GLFWIOSystem::LibraryCode GLFWIOSystem::mapLibraryToEngineKey(LibraryCode code) const
 	{
 		if (code == GLFW_KEY_SPACE) return KEY_SPACE;
 		else if (code == GLFW_KEY_APOSTROPHE) return KEY_APOSTROPHE;
@@ -100,8 +44,25 @@ namespace Cala {
 		return 100;
 	}
 
-	IOSystem::LibraryCode IOSystem::mapEngineToLibraryKey(KeyCode code) const
-	{
+    glm::vec2 GLFWIOSystem::apiGetCursorPosition() const
+    {
+        double x, y;
+        glfwGetCursorPos(windowHandle, &x, &y);
+        return glm::vec2(x, y);
+    }
+
+    bool GLFWIOSystem::apiIsMouseButtonPressed(KeyCode code) const
+    {
+        return glfwGetMouseButton(windowHandle, mapEngineToLibraryKey(code));
+    }
+
+    bool GLFWIOSystem::apiIsKeyPressed(KeyCode code) const
+    {
+        return glfwGetKey(windowHandle, mapEngineToLibraryKey(code));
+    }
+
+    GLFWIOSystem::LibraryCode GLFWIOSystem::mapEngineToLibraryKey(KeyCode code) const
+    {
 		if (code == KEY_SPACE) return GLFW_KEY_SPACE;
 		else if (code == KEY_APOSTROPHE) return GLFW_KEY_APOSTROPHE;
 		else if (code < 3) return calculate(code, GLFW_MOUSE_BUTTON_MIDDLE, MOUSE_BUTTON_MIDDLE, '+');
@@ -114,5 +75,5 @@ namespace Cala {
 		else if (code <= KEY_RIGHT_SUPER) return calculate(code, GLFW_KEY_RIGHT_SUPER, KEY_RIGHT_SUPER, '+');
 
 		return 1000U;
-	}
+    }
 }

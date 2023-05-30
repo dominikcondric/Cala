@@ -4,8 +4,8 @@
 
 namespace Cala {
 
-	BaseApplication::BaseApplication(const Window::Specification& windowSpecification) : 
-		window(Window::construct(windowSpecification)), api(GraphicsAPI::construct()),
+	BaseApplication::BaseApplication(const IWindow::Specification& windowSpecification) : 
+		window(new GLFWWindow(windowSpecification)), api(GraphicsAPI::construct()),
 		camera(Camera::Type::Perspective)
 	{
 		camera.setProjectionAspectRatio((float)windowSpecification.width / windowSpecification.height);
@@ -30,27 +30,27 @@ namespace Cala {
     {
 		if (moveCamera)
 		{
-			const IOSystem& ioSystem = window->getIO();
+			const IIOSystem& ioSystem = window->getIO();
 
-			if (ioSystem.isMouseButtonPressed(IOSystem::MOUSE_BUTTON_RIGHT))
+			if (ioSystem.isMouseButtonPressed(IIOSystem::MOUSE_BUTTON_RIGHT))
 				camera.rotate(ioSystem.getCursorOffset());
 
-			if (ioSystem.isKeyPressed(IOSystem::KEY_W))
+			if (ioSystem.isKeyPressed(IIOSystem::KEY_W))
 				camera.move(Camera::Directions::FORWARD, MOVE_SPEED);
 
-			if (ioSystem.isKeyPressed(IOSystem::KEY_S))
+			if (ioSystem.isKeyPressed(IIOSystem::KEY_S))
 				camera.move(Camera::Directions::BACKWARD, MOVE_SPEED);
 
-			if (ioSystem.isKeyPressed(IOSystem::KEY_A))
+			if (ioSystem.isKeyPressed(IIOSystem::KEY_A))
 				camera.move(Camera::Directions::LEFT, MOVE_SPEED);
 
-			if (ioSystem.isKeyPressed(IOSystem::KEY_D))
+			if (ioSystem.isKeyPressed(IIOSystem::KEY_D))
 				camera.move(Camera::Directions::RIGHT, MOVE_SPEED);
 
-			if (ioSystem.isKeyPressed(IOSystem::KEY_SPACE))
+			if (ioSystem.isKeyPressed(IIOSystem::KEY_SPACE))
 				camera.move(Camera::Directions::UP, MOVE_SPEED);
 
-			if (ioSystem.isKeyPressed(IOSystem::KEY_LEFT_SHIFT))
+			if (ioSystem.isKeyPressed(IIOSystem::KEY_LEFT_SHIFT))
 				camera.move(Camera::Directions::DOWN, MOVE_SPEED);
 		}
 

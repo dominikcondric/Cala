@@ -3,7 +3,7 @@
 
 #define LIGHT_MOVE 10.f * time.deltaTime
 
-DemoApplication::DemoApplication() : BaseApplication(Window::Specification("Demo", 1024, 768, 4)),
+DemoApplication::DemoApplication() : BaseApplication(IWindow::Specification("Demo", 1024, 768, 4)),
 sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube())
 {
 	camera.setProjectionViewingAngle(90.f);
@@ -73,18 +73,18 @@ void DemoApplication::loop()
 	simpleRenderer.render(api.get(), nullptr);
 	lightRenderer.render(api.get(), nullptr);
 
-	const IOSystem& io = window->getIO();
+	const IIOSystem& io = window->getIO();
 	const float moveFactor = 10.f;
 
-	if (io.isKeyPressed(IOSystem::KeyCode::KEY_LEFT)) 
+	if (io.isKeyPressed(IIOSystem::KeyCode::KEY_LEFT)) 
 		lightTransformation.translate(glm::vec3(-time.getDeltaTime() * moveFactor, 0.f, 0.f));
 
-	if (io.isKeyPressed(IOSystem::KeyCode::KEY_RIGHT)) 
+	if (io.isKeyPressed(IIOSystem::KeyCode::KEY_RIGHT)) 
 		lightTransformation.translate(glm::vec3(time.getDeltaTime() * moveFactor, 0.f, 0.f));
 
-	if (io.isKeyPressed(IOSystem::KeyCode::KEY_UP)) 
+	if (io.isKeyPressed(IIOSystem::KeyCode::KEY_UP)) 
 		lightTransformation.translate(glm::vec3(0.f, 0.f, -time.getDeltaTime() * moveFactor));
 
-	if (io.isKeyPressed(IOSystem::KeyCode::KEY_DOWN)) 
+	if (io.isKeyPressed(IIOSystem::KeyCode::KEY_DOWN)) 
 		lightTransformation.translate(glm::vec3(0.f, 0.f, time.getDeltaTime() * moveFactor));
 }

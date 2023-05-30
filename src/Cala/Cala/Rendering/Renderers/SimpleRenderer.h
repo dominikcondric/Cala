@@ -9,7 +9,7 @@ namespace Cala {
 	public:
 		SimpleRenderer();
         ~SimpleRenderer() override = default;
-        void render(GraphicsAPI *const api, const Framebuffer* renderingTarget);
+        void render(GraphicsAPI *const api, const Framebuffer* renderingTarget) override;
 		void setupCamera(const Camera& camera) override;
 
 		struct Renderable {

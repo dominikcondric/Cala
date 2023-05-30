@@ -9,6 +9,7 @@ set(src_files
     Rendering/Texture.h             Rendering/Texture.cpp
     Rendering/TextureArray.h             Rendering/TextureArray.cpp
     Rendering/NativeAPI.h
+    Rendering/GPUResource.h
     
     Rendering/Renderers/IRenderer.h
     Rendering/Renderers/ICameraRenderer.h
@@ -22,8 +23,10 @@ set(src_files
     Utility/Time.h                 Utility/Time.cpp
     Utility/Model.h                 Utility/Model.cpp
     Utility/ModelLoader.h                 Utility/ModelLoader.cpp
-    Utility/Window.h                Utility/Window.cpp
-    Utility/IOSystem.h              Utility/IOSystem.cpp
+    Utility/GLFWWindow.h                Utility/GLFWWindow.cpp
+    Utility/IWindow.h               Utility/IWindow.cpp
+    Utility/IIOSystem.h              Utility/IIOSystem.cpp
+    Utility/GLFWIOSystem.h              Utility/GLFWIOSystem.cpp
     Utility/Transformation.h        Utility/Transformation.cpp
     Utility/BaseApplication.h        Utility/BaseApplication.cpp
     Utility/Logger.h                Utility/Logger.cpp

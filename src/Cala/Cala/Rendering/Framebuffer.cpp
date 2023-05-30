@@ -11,7 +11,7 @@ namespace Cala {
 
 	Framebuffer::~Framebuffer()
 	{
-		glDeleteFramebuffers(1, &framebufferHandle);
+		free();
 	}
 
 	Framebuffer::Framebuffer(Framebuffer&& other) noexcept
@@ -46,6 +46,16 @@ namespace Cala {
 		depthTarget.layer = 0U;
     }
 
+    void Framebuffer::free()
+    {
+		for (auto& target : colorTargets)
+			target->free();
+		
+		depthTarget->free();
+		glDeleteFramebuffers(1, &framebufferHandle);
+		framebufferHandle = GL_NONE;
+    }
+
     void Framebuffer::addColorTarget(TextureArray *target, bool transferOwnership, uint32_t layer)
     {
 		if (!target->isColor() || colorTargets.size() == MAX_COLOR_ATTACHMENTS || layer >= target->getLayerCount())
@@ -64,12 +74,17 @@ namespace Cala {
 		depthTarget.layer = layer;
     }
 
+    bool Framebuffer::isLoaded() const
+    {
+        return framebufferHandle != API_NULL;
+    }
+
     void Framebuffer::load()
     {
 		if (colorTargets.empty() && depthTarget.target == nullptr)
 			return;
 
-		if (framebufferHandle != GL_NONE)
+		if (isLoaded())
 		{
 			Logger::getInstance().logErrorToConsole("Framebuffer already loaded!");
 			return;

@@ -20,11 +20,20 @@ namespace Cala {
 		void setProjectionPlanes(float left, float right, float top, float bottom);
 		void setProjectionViewingAngle(float angle);
 		void setProjectionAspectRatio(float ratio);
+		float getProjectionAspectRatio() const { return aspectRatio; }
+		float getProjectionViewingAngle() const { return viewingAngle; }
+		float getProjectionFarPlane() const { return farPlane; }
+		float getProjectionNearPlane() const { return nearPlane; }
+		glm::vec4 getOrthographicSidePlanes() const { return glm::vec4(topPlane, leftPlane, bottomPlane, rightPlane); }
 		void rotate(const glm::vec2& offset);
 		void move(Directions direction, float deltaTime);
 		void setRotationSensitivity(float sensitivity);
+		float getRotationSensitivity() const { return rotationSensitivity; }
 		void setMoveSensitivity(float sensitivity);
+		float getMoveSensitivity() const { return moveSensitivity; }
 		void setType(Type _type);
+		Type getType() const { return type; }
+		const glm::vec3& getCenter() const { return center; }
 		const glm::vec3& getPosition() const { return position; }
 		const glm::vec3& getUDirection() const { return uDirection; }
 		const glm::vec3& getVDirection() const { return vDirection; }

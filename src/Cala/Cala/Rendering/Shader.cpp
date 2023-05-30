@@ -26,24 +26,43 @@ namespace Cala {
 		return *this;
 	}
 
-	Shader::~Shader()
+    Shader::~Shader()
 	{
-		glDeleteProgram(programHandle);
+		free();
 	}
 
-	void Shader::attachShader(ShaderType shaderStage, const std::filesystem::path& filePath)
+    void Shader::free()
+    {
+		if (attachedShaders != 0)
+		{
+			for (const auto& shader : shaderHandlesBuffer)
+			{
+				glDetachShader(programHandle, shader);
+				glDeleteShader(shader);
+			}
+		}
+
+		glDeleteProgram(programHandle);
+    }
+
+    bool Shader::isLoaded() const
+    {
+        return programHandle != API_NULL;
+    }
+
+    void Shader::attachShader(ShaderType shaderStage, const std::filesystem::path& filePath)
 	{
 		Logger& logger = Logger::getInstance();
 
-		if (programHandle != GL_NONE)
+		if (isLoaded())
 		{
-			attachedShaders = 0;
-			glDeleteProgram(programHandle);
+			logger.logErrorToConsole("Shader program already created!");
+			return;
 		}
 
 		if (attachedShaders & BIT((uint32_t)shaderStage))
 		{
-			logger.logErrorToConsole("Error: shader stage already attached!");
+			logger.logErrorToConsole("Shader stage already attached!");
 			return;
 		}
 
@@ -101,7 +120,7 @@ namespace Cala {
 	{
 		if (programHandle)
 		{
-			Logger::getInstance().logErrorToConsole("Error: Program already created!");
+			Logger::getInstance().logErrorToConsole("Program already created!");
 			return;
 		}
 
@@ -117,7 +136,7 @@ namespace Cala {
 		glGetProgramiv(programHandle, GL_LINK_STATUS, &success);
 		if (!success) {
 			glGetProgramInfoLog(programHandle, 512, nullptr, infoLog);
-			std::cout << "Failed to link program: " << infoLog << std::endl;
+			Logger::getInstance().logErrorToConsole(std::string("Failed to link program: ") + infoLog);
 		}
 
 		for (const auto& shader : shaderHandlesBuffer)
@@ -125,6 +144,9 @@ namespace Cala {
 			glDetachShader(programHandle, shader);
 			glDeleteShader(shader);
 		}
+
+		attachedShaders = 0;
+		shaderHandlesBuffer.clear();
 	}
 
 	void Shader::activate() const

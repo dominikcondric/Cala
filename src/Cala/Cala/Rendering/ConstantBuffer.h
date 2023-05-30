@@ -3,11 +3,10 @@
 #include <string>
 #include <unordered_map>
 #include "NativeAPI.h"
-
-typedef uint32_t GLuint;
+#include "GPUResource.h"
 
 namespace Cala {
-	class ConstantBuffer {
+	class ConstantBuffer : public GPUResource {
 	public:
 		struct ConstantBufferVariableInfo {
 			int offset;
@@ -30,6 +29,8 @@ namespace Cala {
 		ConstantBuffer& operator=(const ConstantBuffer& other) = delete;
 		ConstantBuffer& operator=(ConstantBuffer&& other) noexcept;
 
+		void free() override;
+		bool isLoaded() const override;
 		void setData(ConstantBufferInfo&& bufferInfo, bool isDynamic = false);
 
 		// Updates data

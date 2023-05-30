@@ -1,10 +1,11 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "Window.h"
+#include "GLFWWindow.h"
 #include "Platform.h"
 #include "Logger.h"
 #include "Cala/Rendering/GraphicsAPI.h"
+#include "GLFWIOSystem.h"
 
 #if defined(CALA_PLATFORM_WINDOWS)
 	#define GLFW_EXPOSE_NATIVE_WIN32
@@ -17,16 +18,12 @@
 #include <GLFW/glfw3native.h>
 
 namespace Cala {
-	Window* Window::instance = nullptr;
-
-	Window::Window(const Specification& specification) 
-		: windowName(specification.windowName),
-		  windowSize(specification.width, specification.height)
+	GLFWWindow::GLFWWindow(const Specification& specification) : IWindow(specification) 
 	{
 		if (!glfwInit())
 			Logger::getInstance().logErrorToConsole("Failed to initialize GLFW!");
 
-		glfwWindowHint(GLFW_SAMPLES, specification.sampleCount);
+		glfwWindowHint(GLFW_SAMPLES, sampleCount);
 		windowHandle = glfwCreateWindow(windowSize.x, windowSize.y, windowName.c_str(), NULL, NULL);
 		if (!windowHandle)
 		{
@@ -38,45 +35,31 @@ namespace Cala {
 		glfwSetWindowSizeCallback(windowHandle, windowResizeCallback);
 		glfwSetInputMode(windowHandle, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 		glfwSetWindowUserPointer(windowHandle, this);
-		ioSystem.reset(IOSystem::construct(windowHandle));
+		ioSystem.reset(new GLFWIOSystem(windowHandle));
 
 		glfwMakeContextCurrent(windowHandle);
 		GraphicsAPI::loadAPIFunctions();
 	}
 
-	Window* Window::construct(const Specification& specification)
+	GLFWWindow::~GLFWWindow()
 	{
-		if (!instance)
-			instance = new Window(specification);
-
-		return instance;
-	}
-
-	Window::~Window()
-	{
-		instance = nullptr;
 		glfwMakeContextCurrent(NULL);
 		glfwTerminate();
 	}
 
-	void Window::update()
+	void GLFWWindow::update()
 	{
 		resized = false;
 		ioSystem->update();
 		glfwSwapBuffers(windowHandle);
 	}
 
-	bool Window::exitTriggered() const
+	bool GLFWWindow::exitTriggered() const
 	{
 		return glfwWindowShouldClose(windowHandle);
 	}
 
-	const glm::ivec2& Window::getWindowSize() const
-	{
-		return windowSize;
-	}
-
-	void* Window::getNativeWindowPointer() const
+	void* GLFWWindow::getNativeWindowPointer() const
 	{
 	#if defined GLFW_EXPOSE_NATIVE_WIN32
 		return glfwGetWin32Window(windowHandle);
@@ -87,9 +70,9 @@ namespace Cala {
 	#endif
 	}
 
-	void Window::windowResizeCallback(GLFWwindow* window, int w, int h)
+	void GLFWWindow::windowResizeCallback(GLFWwindow* window, int w, int h)
 	{
-		Window* win = static_cast<Window*>(glfwGetWindowUserPointer(window));
+		GLFWWindow* win = static_cast<GLFWWindow*>(glfwGetWindowUserPointer(window));
 		win->windowSize.x = w;
 		win->windowSize.y = h;
 		win->resized = true;

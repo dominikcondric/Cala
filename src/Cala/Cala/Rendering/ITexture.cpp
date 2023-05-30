@@ -49,6 +49,11 @@ namespace Cala {
         textureHandle = GL_NONE;
     }
 
+    bool ITexture::isLoaded() const
+    {
+        return textureHandle != API_NULL;
+    }
+
     bool ITexture::isDepth() const
     {
         return format == GL_DEPTH_COMPONENT;

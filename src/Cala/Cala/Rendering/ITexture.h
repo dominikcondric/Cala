@@ -1,11 +1,12 @@
 #pragma once
 #include "NativeAPI.h"
 #include <glm/vec2.hpp>
+#include "GPUResource.h"
 
 namespace Cala {
     class Framebuffer;
 
-    class ITexture {
+    class ITexture : public GPUResource {
     public:
         enum class WrappingMethod {
 			ClampToEdge,
@@ -66,7 +67,8 @@ namespace Cala {
         // virtual void attachToFramebuffer(Framebuffer& framebuffer) = 0;
 		glm::ivec2 getDimensions() const { return glm::ivec2(width, height); }
 		void setForSampling(uint32_t bindingIndex) const;
-		void free();
+		void free() override;
+		bool isLoaded() const override;
 		bool isWriteOnly() const { return writeOnly; }
 		bool isDepth() const;
 		bool isColor() const;

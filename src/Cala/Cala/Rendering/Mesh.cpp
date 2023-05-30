@@ -2,6 +2,7 @@
 #include <cstring>
 #include <glad/glad.h>
 #include "NativeAPI.h"
+#include "Cala/Utility/Logger.h"
 
 namespace Cala {
 #ifdef CALA_API_OPENGL
@@ -25,14 +26,19 @@ namespace Cala {
 		vao = other.vao;
 		ebo = other.ebo;
 		vbo = other.vbo;
-		other.vao = GL_NONE;
-		other.vbo = GL_NONE;
-		other.ebo = GL_NONE;
+		other.vao = API_NULL;
+		other.vbo = API_NULL;
+		other.ebo = API_NULL;
 		drawingMode = other.drawingMode;
 		vertexCount = other.vertexCount;
 		indexCount = other.indexCount;
 		return *this;
 	}
+
+    bool Mesh::isLoaded() const
+    {
+		return vbo != API_NULL;
+    }
 
     void Mesh::free()
     {
@@ -40,9 +46,9 @@ namespace Cala {
 		glDeleteBuffers(1, &ebo);
 		glDeleteVertexArrays(1, &vao);
 
-		vbo = GL_NONE;
-		ebo = GL_NONE;
-		vao = GL_NONE;
+		vbo = API_NULL;
+		ebo = API_NULL;
+		vao = API_NULL;
     }
 
     void Mesh::loadFromModel(const Model& model, bool dynamic, bool _cullingEnabled)
@@ -57,11 +63,13 @@ namespace Cala {
 
 	void Mesh::setVertexBufferData(const float* data, uint32_t arraySize, uint32_t _vertexCount, const std::vector<Model::VertexLayoutSpecification>& layouts, bool isDynamic)
 	{
-		if (vbo != GL_NONE)
-			glDeleteBuffers(1, &vbo);
-		else
-			glGenVertexArrays(1, &vao);
+		if (isLoaded())
+		{
+			Logger::getInstance().logErrorToConsole("Buffer already loaded!");
+			return;
+		}
 
+		glGenVertexArrays(1, &vao);
 		this->vertexCount = _vertexCount;
 		glGenBuffers(1, &vbo);
 		glBindVertexArray(vao);
@@ -85,8 +93,11 @@ namespace Cala {
 
 	void Mesh::updateVertexBufferData(const float* data, uint32_t arraySize, uint32_t arrayOffset)
 	{
-		if (vao == GL_NONE)
+		if (!isLoaded())
+		{
+			Logger::getInstance().logErrorToConsole("Buffer not loaded yet!");
 			return;
+		}
 
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -103,7 +114,10 @@ namespace Cala {
 	void Mesh::setIndexBufferData(const uint32_t* data, uint32_t arraySize, bool isDynamic)
 	{
 		if (ebo != GL_NONE)
-			glDeleteBuffers(1, &ebo);
+		{
+			Logger::getInstance().logErrorToConsole("Buffer already loaded!");
+			return;
+		}
 
 		indexCount = arraySize;
 		glGenBuffers(1, &ebo);
@@ -121,7 +135,10 @@ namespace Cala {
 	void Mesh::updateIndexBufferData(const uint32_t* data, uint32_t arraySize, uint32_t arrayOffset)
 	{
 		if (ebo == GL_NONE)
+		{
+			Logger::getInstance().logErrorToConsole("Buffer not loaded yet!");
 			return;
+		}
 
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

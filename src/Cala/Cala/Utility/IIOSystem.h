@@ -1,15 +1,15 @@
 #pragma once
 #include <glm/glm.hpp>
-#include <vector>
+#include <bitset>
 
 struct GLFWwindow;
 
 namespace Cala {
-	class IOSystem {
+	class IIOSystem {
 	public:
-		static IOSystem* construct(GLFWwindow* windowPointer);
-		~IOSystem();
-		void update();
+		IIOSystem();
+		~IIOSystem();
+		virtual void update();
 
 		enum KeyCode {
 			MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_MIDDLE,	// Mouse codes
@@ -49,16 +49,18 @@ namespace Cala {
 		glm::vec2 getCursorPosition() const;
 		glm::vec2 getCursorOffset() const;
 
-	private:
-		IOSystem(GLFWwindow* windowPointer);
-		using LibraryCode = int;
-		std::vector<bool> keyStates;
-		GLFWwindow* windowHandle = nullptr;
+	protected:
 		double cursorX{ 512.f }, cursorY{ 384.f };
 		double lastX{ 0.f }, lastY{ 0.f };
-		LibraryCode mapEngineToLibraryKey(KeyCode code) const;
-		constexpr LibraryCode mapLibraryToEngineKey(LibraryCode code) const;
-		constexpr LibraryCode calculate(LibraryCode code, LibraryCode code1, LibraryCode code2, char op) const;
-		static IOSystem* instance;
+		static const std::size_t KEYS_COUNT = 100U;
+		std::bitset<KEYS_COUNT> oldKeyStates;
+		std::bitset<KEYS_COUNT> newKeyStates;
+
+		virtual glm::vec2 apiGetCursorPosition() const = 0;
+		virtual bool apiIsMouseButtonPressed(KeyCode) const = 0;
+		virtual bool apiIsKeyPressed(KeyCode) const = 0;
+
+	private:
+		static IIOSystem* instance;
 	};
 }

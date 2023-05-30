@@ -2,6 +2,7 @@
 #include <cstring>
 #include "Framebuffer.h"
 #include "GraphicsAPI.h"
+#include "Cala/Utility/Logger.h"
 
 namespace Cala {
 #ifdef CALA_API_OPENGL
@@ -50,13 +51,17 @@ namespace Cala {
 
     void Texture::load(const Specification& specification, void* data)
     {
+        if (isLoaded())
+        {
+            Logger::getInstance().logErrorToConsole("Texture already loaded!");
+            return;
+        }
+
         initializeData(specification);
 
         if (writeOnly)
         {
-            if (textureHandle == GL_NONE)
-                glGenRenderbuffers(1, &textureHandle);
-            
+            glGenRenderbuffers(1, &textureHandle);
             nativeType = GL_RENDERBUFFER;
             glBindRenderbuffer(nativeType, textureHandle);
 		    glRenderbufferStorage(nativeType, format, width, height);
@@ -64,9 +69,7 @@ namespace Cala {
         }
         else 
         {
-            if (textureHandle == GL_NONE)
-                glGenTextures(1, &textureHandle);
-
+            glGenTextures(1, &textureHandle);
             switch (dimensionality)
             {
                 case Dimensionality::OneDimensional:

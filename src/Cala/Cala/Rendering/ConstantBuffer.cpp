@@ -10,8 +10,7 @@ namespace Cala {
 
 	ConstantBuffer::~ConstantBuffer()
 	{
-		glDeleteBuffers(1, &bufferHandle);
-		bindingPointsCache.erase(specification.bindingPoint);
+		free();
 	}
 
 	ConstantBuffer::ConstantBuffer(ConstantBuffer&& other) noexcept
@@ -25,11 +24,22 @@ namespace Cala {
 		errorOccured = other.errorOccured;
 		specification = other.specification;
 		bufferHandle = other.bufferHandle;
-		other.bufferHandle = GL_NONE;
+		other.bufferHandle = API_NULL;
 		return *this;
 	}
 
-	void ConstantBuffer::setData(ConstantBufferInfo&& bufferInfo, bool isDynamic)
+    void ConstantBuffer::free()
+    {
+		glDeleteBuffers(1, &bufferHandle);
+		bindingPointsCache.erase(specification.bindingPoint);
+    }
+
+    bool ConstantBuffer::isLoaded() const
+    {
+        return bufferHandle != API_NULL;
+    }
+
+    void ConstantBuffer::setData(ConstantBufferInfo&& bufferInfo, bool isDynamic)
 	{
 		if (bufferInfo.size == -1)
 		{
@@ -37,8 +47,11 @@ namespace Cala {
 			return;
 		}
 
-		if (bufferHandle != GL_NONE)
-			glDeleteBuffers(1, &bufferHandle);
+		if (isLoaded())
+		{
+			Logger::getInstance().logErrorToConsole("Buffer is already loaded!");
+			return;
+		}
 
 		specification = std::move(bufferInfo);
 

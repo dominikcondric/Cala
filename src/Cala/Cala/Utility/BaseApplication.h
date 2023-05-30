@@ -1,5 +1,5 @@
 #pragma once
-#include "Cala/Utility/Window.h"
+#include "Cala/Utility/GLFWWindow.h"
 #include "Time.h"
 #include "Cala/Rendering/Camera.h"
 #include "Cala/Rendering/GraphicsAPI.h"
@@ -7,12 +7,12 @@
 namespace Cala {
 	class BaseApplication {
 	public:
-		BaseApplication(const Window::Specification& windowSpecification);
+		BaseApplication(const IWindow::Specification& windowSpecification);
 		virtual ~BaseApplication() = 0;
 		void run();
 
 	protected:
-		std::unique_ptr<Window> window;
+		std::unique_ptr<IWindow> window;
 		std::unique_ptr<GraphicsAPI> api;
 		Camera camera;
 		Time time;
