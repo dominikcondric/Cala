@@ -12,16 +12,14 @@ sphereMesh(Model().loadSphere(5, 10)), cubeMesh(Model().loadCube())
 
 	// Reserves are VERY important for memory consistency (references!!!)
 	const uint32_t CUBES_COUNT = 30;
-	transformations.reserve(CUBES_COUNT);
 	cubeRenderables.reserve(CUBES_COUNT);
 	for (int i = 0; i < CUBES_COUNT; ++i) {
 		Transformation transformation;
 		glm::vec2 diskRand = glm::diskRand(19.f);
 		transformation.scale(glm::linearRand(0.5f, 2.f)).translate(glm::vec3(diskRand.x, glm::linearRand(4.f, 8.f), diskRand.y));
-		transformations.push_back(transformation);
 
 		cubeRenderables.push_back(LightRenderer::Renderable(
-			cubeMesh, transformations.back(), glm::vec4((glm::ballRand(1.f) + 1.f) * 0.5f, 1.f),
+			cubeMesh, transformation, glm::vec4((glm::ballRand(1.f) + 1.f) * 0.5f, 1.f),
 			nullptr, nullptr, nullptr, 0.05f, 0.3f, 0.8f, 40.f
 		));
 	}

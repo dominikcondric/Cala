@@ -14,6 +14,7 @@ namespace Cala {
 		~LightRenderer() override = default;
 		void render(GraphicsAPI* const api, const Framebuffer* renderingTarget) override;
 		void setupCamera(const Camera& camera) override;
+		uint32_t getCelShadingLevelCount() const { return celShadingLevelCount; }
 		void enableCelShading(uint32_t levelCount) { celShadingLevelCount = levelCount; }
 		void disableCelShading() { celShadingLevelCount = 0; }
 

@@ -172,7 +172,8 @@ float shadowFactor(const Light light, out uint shadowMapCounter)
 	if (currentDepth >= 1.f)
         return 0.f;
 
-    float shadow = texture(shadowMaps, vec4(lightViewPosition.xy, shadowMapIndex, currentDepth));
+	const float bias = 1e-3;
+    float shadow = texture(shadowMaps, vec4(lightViewPosition.xy, shadowMapIndex, currentDepth - bias));
 
 	// PCF
 	/* vec2 texelSize = 1.f / textureSize(shadowMaps, 0).xy;
@@ -296,7 +297,7 @@ void main()
 {
 	if (!lightened)
 	{
-		outColor = material.color;	
+		outColor = material.color;
 		return;
 	}
 

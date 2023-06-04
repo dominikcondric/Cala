@@ -64,6 +64,15 @@ namespace Cala {
 			gpuLayoutSpecification.push_back({ normalIndex, 3, 0, sizeof(glm::vec3), 0 });
 			gpuLayoutSpecification.push_back({ texCoordIndex, 2, 0,  2 * sizeof(glm::vec3), 0 });
 			gpuLayoutSpecification.push_back({ tangentIndex, 3, 0, 2 * sizeof(glm::vec3) + sizeof(glm::vec2), 0 });
+		} 
+		else
+		{
+			for (uint32_t i = 0; i < positions.size(); ++i)
+			{
+				gpuVertexData.push_back(positions[i].x);
+				gpuVertexData.push_back(positions[i].y);
+				gpuVertexData.push_back(positions[i].z);
+			}
 		}
 
 		for (auto& layout : gpuLayoutSpecification)
@@ -72,7 +81,7 @@ namespace Cala {
 
     Model &Model::loadSphere(uint32_t stackCount, uint32_t sectorCount, float radius)
     {
-		path = "Sphere";
+		name = "Sphere";
 
 		constexpr float pi = glm::pi<float>();
 		float sectorStep = 2 * pi / sectorCount;
@@ -129,7 +138,7 @@ namespace Cala {
 
 	Model& Model::loadPlane(const glm::vec3& minBound, const glm::vec3& maxBound)
 	{
-		path = "Plane";
+		name = "Plane";
 
 		normals = {
 			glm::vec3(0.f, 1.f, 0.f),
@@ -163,7 +172,7 @@ namespace Cala {
 
 	Model& Model::loadRay(const glm::vec3& rayOrigin, const glm::vec3& rayDirection, const float t)
 	{
-		path = "Ray";
+		name = "Ray";
 
 		glm::vec3 rayEnd = rayOrigin + rayDirection * t;
 		positions = {
@@ -179,9 +188,10 @@ namespace Cala {
 	}
 
     Model& Model::loadCustomModel(const std::vector<glm::vec3>& _positions, const std::vector<glm::vec3>& _normals, const std::vector<glm::vec2>& _textureCoordinates,
-		 const std::vector<uint32_t>& _indices, DrawingMode _drawingMode, const std::string& name)
+		 const std::vector<uint32_t>& _indices, DrawingMode _drawingMode, const std::string& _name, const std::string& _path)
 	{
-		path = name;
+		path = _path;
+		name = _name;
 		positions = _positions;
 		normals = _normals;
 		textureCoordinates = _textureCoordinates;
@@ -246,7 +256,8 @@ namespace Cala {
 
 	Model& Model::loadCube(const glm::vec3& minBound, const glm::vec3& maxBound)
 	{
-		path = "Cube";
+		name = "Cube";
+		
 		positions = {
 			// front side
 			maxBound,

@@ -32,6 +32,7 @@ namespace Cala {
 		drawingMode = other.drawingMode;
 		vertexCount = other.vertexCount;
 		indexCount = other.indexCount;
+		cullingEnabled = other.cullingEnabled;
 		return *this;
 	}
 
